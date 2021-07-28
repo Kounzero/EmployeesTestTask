@@ -1,0 +1,115 @@
+﻿<Window x:Class="EmployeesClient.Windows.AddEditEmployeeWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EmployeesClient.Windows"
+        mc:Ignorable="d"
+        Title="Добавление/изменение сотрудника"
+        Height="450"
+        Width="400"
+        MinHeight="350"
+        MinWidth="350">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="ФИО:"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Right"
+                   Margin="5"
+                   Grid.Row="0" />
+        <TextBlock Text="Дата рождения:"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Right"
+                   Margin="5"
+                   Grid.Row="1" />
+        <TextBlock Text="Пол:"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Right"
+                   Margin="5"
+                   Grid.Row="2" />
+        <TextBlock Text="Должность:"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Right"
+                   Margin="5"
+                   Grid.Row="3" />
+        <TextBlock Text="Водительские права:"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Right"
+                   Margin="5"
+                   Grid.Row="4" />
+        <TextBlock Text="Подразделение:"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Right"
+                   Margin="5"
+                   Grid.Row="5" />
+
+        <TextBox x:Name="FullNameTextBox"
+                 Grid.Column="1"
+                 Margin="5"
+                 VerticalAlignment="Center"
+                 Text="{Binding FullName}" />
+        <DatePicker x:Name="BirthDatePicker"
+                    Grid.Column="1"
+                    Grid.Row="1"
+                    VerticalAlignment="Center"
+                    Margin="5"
+                    SelectedDate="{Binding BirthDate}" />
+        <ComboBox x:Name="GendersCombobox"
+                  Grid.Column="1"
+                  Grid.Row="2"
+                  Margin="5"
+                  VerticalAlignment="Center"
+                  SelectedValue="{Binding GenderID}"
+                  SelectedValuePath="id"
+                  DisplayMemberPath="title" />
+        <ComboBox x:Name="PositionsCombobox"
+                  Grid.Column="1"
+                  Grid.Row="3"
+                  Margin="5"
+                  VerticalAlignment="Center"
+                  SelectedValue="{Binding PositionID}"
+                  SelectedValuePath="id"
+                  DisplayMemberPath="title" />
+        <CheckBox x:Name="HasDrivindLicenseCheckBox"
+                  VerticalAlignment="Center"
+                  IsChecked="{Binding HasDrivingLicense}"
+                  Grid.Column="1"
+                  Grid.Row="4"
+                  Margin="5" />
+        <ComboBox x:Name="SubdivisionsCombobox"
+                  Grid.Column="1"
+                  Grid.Row="5"
+                  Margin="5"
+                  VerticalAlignment="Center"
+                  SelectedValue="{Binding SubdivisionID}"
+                  SelectedValuePath="id"
+                  DisplayMemberPath="title" />
+
+        <Button x:Name="BtnOk"
+                Content="Сохранить"
+                Click="BtnOk_Click"
+                Grid.Column="1"
+                Grid.Row="6"
+                Margin="5"
+                VerticalAlignment="Center" />
+        <Button x:Name="BtnCancel"
+                Content="Отмена"
+                Click="BtnCancel_Click"
+                Grid.Row="6"
+                Margin="5"
+                VerticalAlignment="Center" />
+    </Grid>
+</Window>

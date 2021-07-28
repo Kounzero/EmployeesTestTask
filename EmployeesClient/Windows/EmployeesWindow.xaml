@@ -1,0 +1,120 @@
+﻿<Window x:Class="EmployeesClient.Windows.EmployeesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EmployeesClient.Windows"
+        mc:Ignorable="d"
+        Title="Подразделения и сотрудники"
+        Height="450"
+        Width="800"
+        MinHeight="300"
+        MinWidth="700">
+    <Window.Resources>
+        <DataTemplate x:Key="SubdivisionItemTemplate">
+            <StackPanel Orientation="Horizontal"
+                        Margin="{Binding MarginForDisplay}"
+                        ToolTip="{Binding description}">
+                <Button x:Name="BtnOpenChildren"
+                        Content="{Binding BtnDisplayContent}"
+                        VerticalAlignment="Center"
+                        Click="BtnOpenChildren_Click"
+                        Visibility="{Binding ShowedVisibility}"
+                        Width="15"
+                        Height="15"
+                        Margin="5 0 5 0"
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        BorderThickness="0" />
+                <TextBlock Text="{Binding title}"
+                           VerticalAlignment="Center" />
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="2*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <GroupBox Header="Подразделения"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Center"
+                  Margin="10">
+            <StackPanel Orientation="Horizontal"
+                        VerticalAlignment="Center">
+                <Button x:Name="BtnAddSubdivision"
+                        Content="Добавить"
+                        Click="BtnAddSubdivision_Click"
+                        Margin="10 5 5 5" />
+                <Button x:Name="BtnEditSubdivision"
+                        Content="Изменить"
+                        Click="BtnEditSubdivision_Click"
+                        Margin="5" />
+                <Button x:Name="BtnDeleteSubdivision"
+                        Content="Удалить"
+                        Click="BtnDeleteSubdivision_Click"
+                        Margin="5" />
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox Header="Сотрудники"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Center"
+                  Margin="10"
+                  Grid.Column="1">
+            <StackPanel Orientation="Horizontal"
+                        VerticalAlignment="Center">
+                <Button x:Name="BtnAddEmployee"
+                        Content="Добавить"
+                        Click="BtnAddEmployee_Click"
+                        Margin="10 5 5 5" />
+                <Button x:Name="BtnEditEmployee"
+                        Content="Изменить"
+                        Click="BtnEditEmployee_Click"
+                        Margin="5" />
+                <Button x:Name="BtnDeleteEmployee"
+                        Content="Удалить"
+                        Click="BtnDeleteEmployee_Click"
+                        Margin="5" />
+            </StackPanel>
+        </GroupBox>
+
+        <ListView x:Name="SubdivisionsListView"
+                  Grid.Row="1"
+                  Margin="10"
+                  SelectionMode="Single"
+                  SelectionChanged="SubdivisionsListView_SelectionChanged"
+                  ItemTemplate="{StaticResource ResourceKey=SubdivisionItemTemplate}" />
+
+        <DataGrid x:Name="EmployeesDataGrid"
+                  Grid.Row="1"
+                  Grid.Column="1"
+                  SelectionMode="Single"
+                  Margin="10"
+                  MouseDoubleClick="EmployeesListView_MouseDoubleClick"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True" ColumnWidth="*">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ФИО"
+                                    Binding="{Binding FullName}" />
+                <DataGridTextColumn Header="Дата рождения"
+                                    Binding="{Binding ShowedDate}" />
+                <DataGridTextColumn Header="Пол"
+                                    Binding="{Binding GenderTitle}" />
+                <DataGridTextColumn Header="Должность"
+                                    Binding="{Binding PositionTitle}" />
+                <DataGridTextColumn Header="Есть права?"
+                                    Binding="{Binding ShowedHasDrivingLicense}" />
+                <DataGridTextColumn Header="Подразделение"
+                                    Binding="{Binding SubdivisionTitle}" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+
+    </Grid>
+</Window>
