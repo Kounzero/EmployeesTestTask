@@ -8,16 +8,17 @@ namespace EmployeesClient.Models.Subdivisions
         public SubdivisionDto()
         {
             Opened = false;
+            LeftMargin = 0;
         }
 
-        public int id { get; set; }
-        public string title { get; set; }
-        public DateTime formDate { get; set; }
-        public string description { get; set; }
-        public int? parentSubdivisionID { get; set; }
-        public bool hasChildren { get; set; }
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public DateTime FormDate { get; set; }
+        public string Description { get; set; }
+        public int? ParentSubdivisionID { get; set; }
+        public bool HasChildren { get; set; }
 
-        public Visibility ShowedVisibility { get { return hasChildren ? Visibility.Visible : Visibility.Hidden; } }
+        public Visibility ShowedVisibility { get { return HasChildren ? Visibility.Visible : Visibility.Hidden; } }
         public string MarginForDisplay { get { return $"{LeftMargin} 0 0 0"; } }
         public int LeftMargin { get; set; }
         public bool Opened { get; set; }

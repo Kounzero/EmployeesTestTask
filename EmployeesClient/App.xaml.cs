@@ -1,4 +1,7 @@
 ﻿using EmployeesClient.Windows;
+using Newtonsoft.Json;
+using System;
+using System.IO;
 using System.Windows;
 
 namespace EmployeesClient
@@ -8,10 +11,12 @@ namespace EmployeesClient
     /// </summary>
     public partial class App : Application
     {
-        public static readonly string MainUri = "http://localhost:5002/api/";
+        public static AppConfig.AppConfig AppConfig;
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            ConfigureApp();
+
             MainWindow = new EmployeesWindow();
             MainWindow.Show();
         }
@@ -20,6 +25,21 @@ namespace EmployeesClient
         {
             e.Handled = true;
             MessageBox.Show("Произошла непредвиденная ошибка", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        private void ConfigureApp()
+        {
+            try
+            {
+                var configurationString = File.ReadAllText( "./AppConfig/appconfig.json");
+                var configuration = JsonConvert.DeserializeObject<AppConfig.AppConfig>(configurationString);
+
+                AppConfig = configuration;
+            }
+            catch (FileNotFoundException)
+            {
+                throw new FileNotFoundException("Файл конфигурации не обнаружен");
+            }
         }
     }
 }

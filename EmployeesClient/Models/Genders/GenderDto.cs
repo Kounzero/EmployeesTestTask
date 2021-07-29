@@ -2,7 +2,7 @@
 {
     public class GenderDto
     {
-        public int id { get; set; }
-        public string title { get; set; }
+        public int Id { get; set; }
+        public string Title { get; set; }
     }
 }

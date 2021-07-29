@@ -6,9 +6,9 @@ namespace EmployeesClient.Models.Employees
     {
         public string FullName { get; set; }
         public DateTime BirthDate { get; set; }
-        public int GenderID { get; set; }
-        public int PositionID { get; set; }
+        public int GenderId { get; set; }
+        public int PositionId { get; set; }
         public bool HasDrivingLicense { get; set; }
-        public int SubdivisionID { get; set; }
+        public int SubdivisionId { get; set; }
     }
 }

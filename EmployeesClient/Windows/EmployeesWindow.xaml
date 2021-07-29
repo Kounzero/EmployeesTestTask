@@ -14,7 +14,7 @@
         <DataTemplate x:Key="SubdivisionItemTemplate">
             <StackPanel Orientation="Horizontal"
                         Margin="{Binding MarginForDisplay}"
-                        ToolTip="{Binding description}">
+                        ToolTip="{Binding Description}">
                 <Button x:Name="BtnOpenChildren"
                         Content="{Binding BtnDisplayContent}"
                         VerticalAlignment="Center"
@@ -26,7 +26,7 @@
                         Background="Transparent"
                         BorderBrush="Transparent"
                         BorderThickness="0" />
-                <TextBlock Text="{Binding title}"
+                <TextBlock Text="{Binding Title}"
                            VerticalAlignment="Center" />
             </StackPanel>
         </DataTemplate>

@@ -1,5 +1,6 @@
 ﻿using EmployeesClient.Models.Employees;
 using EmployeesClient.Models.Subdivisions;
+using EmployeesClient.Services;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -15,72 +16,53 @@ namespace EmployeesClient.Windows
     public partial class EmployeesWindow : Window
     {
         private List<SubdivisionDto> Subdivisions = new List<SubdivisionDto>();
-        private List<EmployeeDto> Employees = new List<EmployeeDto>();
-
+        private IEmployeeService EmployeeService { get; set; }
+        private ISubdivisionService SubdivisionService { get; set; }
 
         public EmployeesWindow()
         {
             InitializeComponent();
 
+            EmployeeService = new EmployeeService();
+            SubdivisionService = new SubdivisionService();
+
             RefreshSubdivisions();
         }
 
-        private List<SubdivisionDto> LoadSubdivisions(int? parentId)
+        private async void RefreshSubdivisions()
         {
-            var client = new HttpClient();
-            var response = client.GetAsync($"{App.MainUri}Subdivisions/GetSubdivisions{(parentId == null ? "" : "?parentSubdivisionId=" + parentId)}").Result;
-            var responseString = response.Content.ReadAsStringAsync().Result;
-
-            var data = JsonConvert.DeserializeObject<List<SubdivisionDto>>(responseString);
-
-            return data;
-        }
-
-        private void RefreshSubdivisions()
-        {
-            Subdivisions = LoadSubdivisions(null);
-
-            foreach (var subdivision in Subdivisions)
-            {
-                subdivision.LeftMargin = 0;
-            }
+            Subdivisions = await SubdivisionService.GetSubdivisions(null);
 
             SubdivisionsListView.ItemsSource = Subdivisions;
             SubdivisionsListView.SelectedIndex = 0;
         }
 
-        private void LoadEmployees(int subdivisionId)
+        private async void LoadEmployees(int subdivisionId)
         {
-            var client = new HttpClient();
-            var response = client.GetAsync($"{App.MainUri}Employees?subdivisionId={subdivisionId}").Result;
-            var responseString = response.Content.ReadAsStringAsync().Result;
-
-            var data = JsonConvert.DeserializeObject<List<EmployeeDto>>(responseString);
-            Employees = data;
-
-            EmployeesDataGrid.ItemsSource = Employees;
+            EmployeesDataGrid.ItemsSource = await EmployeeService.GetEmployees(subdivisionId);
         }
 
         private void EditEmployee()
         {
-            if (EmployeesDataGrid.SelectedItem is EmployeeDto employeeDto)
+            if (!(EmployeesDataGrid.SelectedItem is EmployeeDto employeeDto))
             {
-                var editableEmployee = new EditEmployeeDto()
-                {
-                    BirthDate = employeeDto.BirthDate,
-                    FullName = employeeDto.FullName,
-                    GenderID = employeeDto.GenderID,
-                    HasDrivingLicense = employeeDto.HasDrivingLicense,
-                    ID = employeeDto.ID,
-                    PositionID = employeeDto.PositionID,
-                    SubdivisionID = employeeDto.SubdivisionID
-                };
+                return;
+            }
 
-                if (new AddEditEmployeeWindow(editableEmployee).ShowDialog() == true)
-                {
-                    LoadEmployees((SubdivisionsListView.SelectedItem as SubdivisionDto).id);
-                }
+            var editableEmployee = new EditEmployeeDto()
+            {
+                BirthDate = employeeDto.BirthDate,
+                FullName = employeeDto.FullName,
+                GenderId = employeeDto.GenderId,
+                HasDrivingLicense = employeeDto.HasDrivingLicense,
+                Id = employeeDto.Id,
+                PositionId = employeeDto.PositionId,
+                SubdivisionId = employeeDto.SubdivisionId
+            };
 
+            if (new AddEditEmployeeWindow(editableEmployee).ShowDialog().Value)
+            {
+                LoadEmployees((SubdivisionsListView.SelectedItem as SubdivisionDto).Id);
             }
         }
 
@@ -88,21 +70,20 @@ namespace EmployeesClient.Windows
         {
             if (SubdivisionsListView.SelectedItem is SubdivisionDto selectedSubdivision)
             {
-                LoadEmployees(selectedSubdivision.id);
+                LoadEmployees(selectedSubdivision.Id);
             }
         }
 
-        private void BtnOpenChildren_Click(object sender, RoutedEventArgs e)
+        private async void BtnOpenChildren_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
             var parentSubdivision = button.DataContext as SubdivisionDto;
-
             parentSubdivision.Opened = !parentSubdivision.Opened;
             var startIndex = Subdivisions.IndexOf(parentSubdivision) + 1;
 
             if (parentSubdivision.Opened)
             {
-                var children = LoadSubdivisions(parentSubdivision.id);
+                var children = await SubdivisionService.GetSubdivisions(parentSubdivision.Id);
 
                 foreach (var child in children)
                 {
@@ -114,11 +95,13 @@ namespace EmployeesClient.Windows
             else
             {
                 var endIndex = Subdivisions.Count;
+
                 for (int i = startIndex; i < Subdivisions.Count; i++)
                 {
                     if (Subdivisions[i].LeftMargin <= parentSubdivision.LeftMargin)
                     {
                         endIndex = i;
+
                         break;
                     }
                 }
@@ -137,7 +120,7 @@ namespace EmployeesClient.Windows
 
         private void BtnAddSubdivision_Click(object sender, RoutedEventArgs e)
         {
-            if (new AddEditSubdivisionWindow().ShowDialog() == true)
+            if (new AddEditSubdivisionWindow().ShowDialog().Value)
             {
                 RefreshSubdivisions();
             }
@@ -145,64 +128,69 @@ namespace EmployeesClient.Windows
 
         private void BtnEditSubdivision_Click(object sender, RoutedEventArgs e)
         {
-            if (SubdivisionsListView.SelectedItem is SubdivisionDto subdivisionDto)
+            if (!(SubdivisionsListView.SelectedItem is SubdivisionDto subdivisionDto))
             {
-                var editableSubdivision = new EditSubdivisionDto()
-                {
-                    ID = subdivisionDto.id,
-                    Description = subdivisionDto.description,
-                    ParentSubdivisionID = subdivisionDto.parentSubdivisionID,
-                    Title = subdivisionDto.title
-                };
+                return;
+            }
 
-                if (new AddEditSubdivisionWindow(editableSubdivision).ShowDialog() == true)
-                {
-                    RefreshSubdivisions();
-                }
+            var editableSubdivision = new EditSubdivisionDto()
+            {
+                Id = subdivisionDto.Id,
+                Description = subdivisionDto.Description,
+                ParentSubdivisionId = subdivisionDto.ParentSubdivisionID,
+                Title = subdivisionDto.Title
+            };
+
+            if (new AddEditSubdivisionWindow(editableSubdivision).ShowDialog().Value)
+            {
+                RefreshSubdivisions();
             }
         }
 
-        private void BtnDeleteSubdivision_Click(object sender, RoutedEventArgs e)
+        private async void BtnDeleteSubdivision_Click(object sender, RoutedEventArgs e)
         {
-            if (SubdivisionsListView.SelectedItem is SubdivisionDto subdivision)
-            {
-                if (!subdivision.hasChildren || MessageBox.Show("При удалении подразделения также удалятся все его дочерние подразделения, сотрудники и сотрудники дочерних подразделений",
-                    "Продолжить?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                {
-                    var client = new HttpClient();
-                    var response = client.DeleteAsync($"{App.MainUri}Subdivisions/{subdivision.id}").Result;
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        MessageBox.Show("Удаление успешно", "Успех", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-
-                        RefreshSubdivisions();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Произошла ошибка", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
-                }
-            }
-            else
+            if (!(SubdivisionsListView.SelectedItem is SubdivisionDto subdivision))
             {
                 MessageBox.Show("Выберите Подразделение", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+
                 return;
             }
+
+            if (subdivision.HasChildren && MessageBox.Show("При удалении подразделения также удалятся все его дочерние подразделения, сотрудники и сотрудники дочерних подразделений",
+                "Продолжить?", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            var response = await SubdivisionService.DeleteSubdivision(subdivision.Id);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                MessageBox.Show("Произошла ошибка", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                return;
+            }
+
+            MessageBox.Show("Удаление успешно", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            RefreshSubdivisions();
         }
 
         private void BtnAddEmployee_Click(object sender, RoutedEventArgs e)
         {
-            if (new AddEditEmployeeWindow().ShowDialog() == true)
+            if (!new AddEditEmployeeWindow().ShowDialog().Value)
             {
-                if (SubdivisionsListView.SelectedIndex == -1)
-                {
-                    EmployeesDataGrid.ItemsSource = null;
-                    return;
-                }
-                LoadEmployees((SubdivisionsListView.SelectedItem as SubdivisionDto).id);
+                return;
             }
+
+            if (SubdivisionsListView.SelectedIndex == -1)
+            {
+                EmployeesDataGrid.ItemsSource = null;
+
+                return;
+            }
+
+            LoadEmployees((SubdivisionsListView.SelectedItem as SubdivisionDto).Id);
         }
 
         private void BtnEditEmployee_Click(object sender, RoutedEventArgs e)
@@ -210,33 +198,32 @@ namespace EmployeesClient.Windows
             EditEmployee();
         }
 
-        private void BtnDeleteEmployee_Click(object sender, RoutedEventArgs e)
+        private async void BtnDeleteEmployee_Click(object sender, RoutedEventArgs e)
         {
-            if (EmployeesDataGrid.SelectedItem is EmployeeDto employee)
-            {
-                if (MessageBox.Show("Удалить выббранного сотрудника?", "Продолжить?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                {
-                    var client = new HttpClient();
-                    var response = client.DeleteAsync($"{App.MainUri}Employees/{employee.ID}").Result;
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        MessageBox.Show("Удаление успешно", "Успех", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-
-                        LoadEmployees((SubdivisionsListView.SelectedItem as SubdivisionDto).id);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Произошла ошибка", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return;
-                    }
-                }
-            }
-            else
+            if (!(EmployeesDataGrid.SelectedItem is EmployeeDto employee))
             {
                 MessageBox.Show("Выберите сотрудника", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+
                 return;
             }
+
+            if (MessageBox.Show("Удалить выббранного сотрудника?", "Продолжить?", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            var response = await EmployeeService.DeleteEmployee(employee.Id);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                MessageBox.Show("Произошла ошибка", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                return;
+            }
+
+            MessageBox.Show("Удаление успешно", "Успех", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+
+            LoadEmployees((SubdivisionsListView.SelectedItem as SubdivisionDto).Id);
         }
     }
 }

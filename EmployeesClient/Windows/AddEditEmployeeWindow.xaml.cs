@@ -2,6 +2,7 @@
 using EmployeesClient.Models.Genders;
 using EmployeesClient.Models.Positions;
 using EmployeesClient.Models.Subdivisions;
+using EmployeesClient.Services;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,11 @@ namespace EmployeesClient.Windows
     /// </summary>
     public partial class AddEditEmployeeWindow : Window
     {
+        private IEmployeeService EmployeeService { get; set; }
+        private IGenderService GenderService { get; set; }
+        private IPositionService PositionService { get; set; }
+        private ISubdivisionService SubdivisionService { get; set; }
+
         public AddEditEmployeeWindow()
         {
             InitializeComponent();
@@ -24,92 +30,98 @@ namespace EmployeesClient.Windows
 
             DataContext = new AddEmployeeDto();
             (DataContext as AddEmployeeDto).BirthDate = DateTime.Now.AddYears(-18);
-
-            LoadComboBoxes();
         }
 
         public AddEditEmployeeWindow(EditEmployeeDto editEmployeeDto)
         {
             InitializeComponent();
 
-            Title = "Изменение данных сотрудника №" + editEmployeeDto.ID;
+            Title = "Изменение данных сотрудника №" + editEmployeeDto.Id;
 
             DataContext = editEmployeeDto;
+        }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            EmployeeService = new EmployeeService();
+            GenderService = new GenderService();
+            PositionService = new PositionService();
+            SubdivisionService = new SubdivisionService();
             LoadComboBoxes();
         }
 
-        private void LoadComboBoxes()
+        private async void LoadComboBoxes()
         {
-            var client = new HttpClient();
-            var response = client.GetAsync($"{App.MainUri}Genders").Result;
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var genders = JsonConvert.DeserializeObject<List<GenderDto>>(response.Content.ReadAsStringAsync().Result);
-                GendersCombobox.ItemsSource = genders;
+                GendersCombobox.ItemsSource = await GenderService.GetGenders();
+                PositionsCombobox.ItemsSource = await PositionService.GetPositions();
+                SubdivisionsCombobox.ItemsSource = await SubdivisionService.GetAllSubdivisions();
             }
-
-            response = client.GetAsync($"{App.MainUri}Positions").Result;
-
-            if (response.IsSuccessStatusCode)
+            catch (HttpRequestException error)
             {
-                var positions = JsonConvert.DeserializeObject<List<PositionDto>>(response.Content.ReadAsStringAsync().Result);
-                PositionsCombobox.ItemsSource = positions;
+                MessageBox.Show($"Ошибка соединения с сервером: {error.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                return;
             }
-
-            response = client.GetAsync($"{App.MainUri}Subdivisions").Result;
-
-            if (response.IsSuccessStatusCode)
+            catch (Exception error)
             {
-                var subdivisions = JsonConvert.DeserializeObject<List<SubdivisionDto>>(response.Content.ReadAsStringAsync().Result);
-                SubdivisionsCombobox.ItemsSource = subdivisions;
+                MessageBox.Show($"Неизвестная ошибка. Сообщение:\n{error.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                return;
             }
         }
 
-        private void BtnOk_Click(object sender, RoutedEventArgs e)
+        private async void BtnOk_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(FullNameTextBox.Text) ||
-                BirthDatePicker.SelectedDate == null ||
-                GendersCombobox.SelectedIndex == -1 ||
-                PositionsCombobox.SelectedIndex == -1 ||
-                SubdivisionsCombobox.SelectedIndex == -1)
+            try
             {
-                MessageBox.Show("Заполните все поля", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
+                var isDataIsValid =
+                    string.IsNullOrEmpty(FullNameTextBox.Text) ||
+                    BirthDatePicker.SelectedDate == null ||
+                    GendersCombobox.SelectedIndex == -1 ||
+                    PositionsCombobox.SelectedIndex == -1 ||
+                    SubdivisionsCombobox.SelectedIndex == -1;
 
-            var client = new HttpClient();
-
-            var response = new HttpResponseMessage();
-
-            if (DataContext is EditEmployeeDto editEmployeeDto)
-            {
-                response = client.SendAsync(new HttpRequestMessage()
+                if (!isDataIsValid)
                 {
-                    Content = new StringContent(JsonConvert.SerializeObject(editEmployeeDto), Encoding.UTF8, "application/json"),
-                    Method = HttpMethod.Put,
-                    RequestUri = new Uri($"{App.MainUri}Employees")
-                }).Result;
-            }
-            else
-            {
-                response = client.SendAsync(new HttpRequestMessage()
-                {
-                    Content = new StringContent(JsonConvert.SerializeObject(DataContext as AddEmployeeDto), Encoding.UTF8, "application/json"),
-                    Method = HttpMethod.Post,
-                    RequestUri = new Uri($"{App.MainUri}Employees")
-                }).Result;
-            }
+                    MessageBox.Show("Заполните все поля", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
 
-            if (response.IsSuccessStatusCode)
-            {
+                    return;
+                }
+
+                HttpResponseMessage response;
+
+                if (DataContext is EditEmployeeDto editEmployeeDto)
+                {
+                    response = await EmployeeService.EditEmployee(editEmployeeDto);
+                }
+                else
+                {
+                    response = await EmployeeService.AddEmployee(DataContext as AddEmployeeDto);
+                }
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    MessageBox.Show($"При обновлении данных произошла следующая ошибка:\n{response.StatusCode} - {response.Content.ReadAsStringAsync().Result}", 
+                        "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                    return;
+                }
+
                 MessageBox.Show("Данные успешно обновлены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 DialogResult = true;
             }
-            else
+            catch (HttpRequestException)
             {
-                MessageBox.Show($"При обновлении данных произошла следующая ошибка:\n{response.StatusCode} - {response.Content.ReadAsStringAsync().Result}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Ошибка соединения с сервером", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                return;
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show($"Неизвестная ошибка. Сообщение:\n{error.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+
                 return;
             }
         }

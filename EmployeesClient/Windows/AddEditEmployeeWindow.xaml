@@ -9,7 +9,8 @@
         Height="450"
         Width="400"
         MinHeight="350"
-        MinWidth="350">
+        MinWidth="350"
+        Loaded="Window_Loaded">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
@@ -73,16 +74,16 @@
                   Margin="5"
                   VerticalAlignment="Center"
                   SelectedValue="{Binding GenderID}"
-                  SelectedValuePath="id"
-                  DisplayMemberPath="title" />
+                  SelectedValuePath="Id"
+                  DisplayMemberPath="Title" />
         <ComboBox x:Name="PositionsCombobox"
                   Grid.Column="1"
                   Grid.Row="3"
                   Margin="5"
                   VerticalAlignment="Center"
                   SelectedValue="{Binding PositionID}"
-                  SelectedValuePath="id"
-                  DisplayMemberPath="title" />
+                  SelectedValuePath="Id"
+                  DisplayMemberPath="Title" />
         <CheckBox x:Name="HasDrivindLicenseCheckBox"
                   VerticalAlignment="Center"
                   IsChecked="{Binding HasDrivingLicense}"
@@ -95,8 +96,8 @@
                   Margin="5"
                   VerticalAlignment="Center"
                   SelectedValue="{Binding SubdivisionID}"
-                  SelectedValuePath="id"
-                  DisplayMemberPath="title" />
+                  SelectedValuePath="Id"
+                  DisplayMemberPath="Title" />
 
         <Button x:Name="BtnOk"
                 Content="Сохранить"

@@ -9,7 +9,8 @@
         Height="250"
         Width="400"
         MinHeight="250"
-        MinWidth="390">
+        MinWidth="390"
+        Loaded="Window_LoadedAsync">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
@@ -55,8 +56,8 @@
                     VerticalAlignment="Center">
             <ComboBox x:Name="ParentComboBox"
                       SelectedValue="{Binding ParentSubdivisionID}"
-                      SelectedValuePath="id"
-                      DisplayMemberPath="title"
+                      SelectedValuePath="Id"
+                      DisplayMemberPath="Title"
                       VerticalAlignment="Center"
                       HorizontalAlignment="Stretch"
                       Margin="5" />

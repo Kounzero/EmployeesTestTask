@@ -1,10 +1,12 @@
 ﻿using EmployeesClient.Models.Subdivisions;
+using EmployeesClient.Services;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace EmployeesClient.Windows
@@ -15,16 +17,13 @@ namespace EmployeesClient.Windows
     public partial class AddEditSubdivisionWindow : Window
     {
         private List<SubdivisionDto> Subdivisions = new List<SubdivisionDto>();
+        private ISubdivisionService SubdivisionService { get; set; }
 
         public AddEditSubdivisionWindow()
         {
             InitializeComponent();
 
             Title = "Добавление подразделения";
-
-            LoadData();
-
-            ParentComboBox.ItemsSource = Subdivisions;
 
             DataContext = new AddSubdivisionDto();
         }
@@ -33,68 +32,53 @@ namespace EmployeesClient.Windows
         {
             InitializeComponent();
 
-            Title = "Изменение данных о подразделении №" + editSubdivisionDto.ID;
-
-            LoadData();
-
-            Subdivisions.Remove(Subdivisions.FirstOrDefault(x => x.id == editSubdivisionDto.ID));
-            ParentComboBox.ItemsSource = Subdivisions;
+            Title = "Изменение данных о подразделении №" + editSubdivisionDto.Id;
 
             DataContext = editSubdivisionDto;
         }
 
-        private void LoadData()
+        private async void Window_LoadedAsync(object sender, RoutedEventArgs e)
         {
-            var client = new HttpClient();
-            var response = client.GetAsync($"{App.MainUri}Subdivisions").Result;
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                Subdivisions = JsonConvert.DeserializeObject<List<SubdivisionDto>>(response.Content.ReadAsStringAsync().Result);
+                SubdivisionService = new SubdivisionService();
+                ParentComboBox.ItemsSource = await SubdivisionService.GetAllSubdivisions();
+                ParentComboBox.Items.Remove(Subdivisions.FirstOrDefault(x => x.Id == (DataContext as EditSubdivisionDto).Id));
+            }
+            catch (InvalidOperationException)
+            {
+                return;
             }
         }
 
-        private void BtnOk_Click(object sender, RoutedEventArgs e)
+        private async void BtnOk_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(TitleTextBox.Text))
             {
                 MessageBox.Show("Введите название подразделения", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+
                 return;
             }
-
-            var client = new HttpClient();
 
             var response = new HttpResponseMessage();
 
             if (DataContext is EditSubdivisionDto editSubdivisionDto)
             {
-                response = client.SendAsync(new HttpRequestMessage()
-                {
-                    Content = new StringContent(JsonConvert.SerializeObject(editSubdivisionDto), Encoding.UTF8, "application/json"),
-                    Method = HttpMethod.Put,
-                    RequestUri = new Uri($"{App.MainUri}Subdivisions")
-                }).Result;
+                response = await SubdivisionService.EditSubdivision(editSubdivisionDto);
             }
             else
             {
-                response = client.SendAsync(new HttpRequestMessage()
-                {
-                    Content = new StringContent(JsonConvert.SerializeObject(DataContext as AddSubdivisionDto), Encoding.UTF8, "application/json"),
-                    Method = HttpMethod.Post,
-                    RequestUri = new Uri($"{App.MainUri}Subdivisions")
-                }).Result;
+                response = await SubdivisionService.AddSubdivision(DataContext as AddSubdivisionDto);
             }
 
-            if (response.IsSuccessStatusCode)
-            {
-                MessageBox.Show("Данные успешно обновлены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                DialogResult = true;
-            }
-            else
+            if (!response.IsSuccessStatusCode)
             {
                 MessageBox.Show($"При обновлении данных произошла следующая ошибка:\n{response.StatusCode} - {response.Content.ReadAsStringAsync().Result}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+
+            MessageBox.Show("Данные успешно обновлены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+            DialogResult = true;
         }
 
         private void BtnCancel_Click(object sender, RoutedEventArgs e)
