@@ -46,7 +46,9 @@ namespace EmployeesAPI
                 });
             });
 
-            services.AddAutoMapper(cfg => cfg.AddProfile(new MappingProfile()));
+            services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
+
+            services.AddMemoryCache();
 
             services.AddScoped<IEmployeeService, EmployeeService>();
             services.AddScoped<IGenderService, GenderService>();

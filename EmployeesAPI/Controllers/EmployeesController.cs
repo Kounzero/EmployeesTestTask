@@ -36,7 +36,7 @@ namespace EmployeesAPI.Controllers
         [HttpPut]
         public async Task<IActionResult> PutEmployee([FromBody] EditEmployeeDto editEmployeeDto)
         {
-            switch (await EmployeeService.PutEmployee(editEmployeeDto))
+            switch (await EmployeeService.EditEmployee(editEmployeeDto))
             {
                 case 0:
                     return Ok();
@@ -54,7 +54,7 @@ namespace EmployeesAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Employee>> PostEmployee([FromBody] AddEmployeeDto addEmployeeDto)
         {
-            switch (await EmployeeService.PostEmployee(addEmployeeDto))
+            switch (await EmployeeService.AddEmployee(addEmployeeDto))
             {
                 case 0:
                     return Ok();

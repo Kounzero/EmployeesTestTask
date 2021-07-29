@@ -11,8 +11,8 @@ namespace EmployeesAPI.Services
     public interface IEmployeeService
     {
         public Task<List<EmployeeDto>> GetEmployees(int subdivisionId);
-        public Task<int> PutEmployee(EditEmployeeDto editEmployeeDto);
-        public Task<int> PostEmployee(AddEmployeeDto addEmployeeDto);
+        public Task<int> EditEmployee(EditEmployeeDto editEmployeeDto);
+        public Task<int> AddEmployee(AddEmployeeDto addEmployeeDto);
         public Task<int> DeleteEmployee(int id);
     }
 }

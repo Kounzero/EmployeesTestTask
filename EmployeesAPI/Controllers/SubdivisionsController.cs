@@ -43,7 +43,7 @@ namespace EmployeesAPI.Controllers
         [HttpPut]
         public async Task<IActionResult> PutSubdivision([FromBody] EditSubdivisionDto editSubdivisionDto)
         {
-            switch (await SubdivisionService.PutSubdivision(editSubdivisionDto))
+            switch (await SubdivisionService.EditSubdivision(editSubdivisionDto))
             {
                 case 0:
                     return Ok();
@@ -63,7 +63,7 @@ namespace EmployeesAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Subdivision>> PostSubdivision([FromBody] AddSubdivisionDto addSubdivisionDto)
         {
-            switch (await SubdivisionService.PostSubdivision(addSubdivisionDto))
+            switch (await SubdivisionService.AddSubdivision(addSubdivisionDto))
             {
                 case 0:
                     return Ok();
