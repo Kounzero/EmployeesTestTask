@@ -1,18 +1,16 @@
 ﻿using AutoMapper;
 using EmployeesAPI.Caching;
-using EmployeesAPI.Entities;
 using EmployeesAPI.Models;
 using EmployeesAPI.Models.Dtos.Positions;
-using Microsoft.AspNetCore.Mvc;
+using EmployeesAPI.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace EmployeesAPI.Services
 {
+    ///<inheritdoc cref="IPositionService"/>
     public class PositionService : IPositionService
     {
         private readonly DatabaseContext _context;
@@ -26,18 +24,15 @@ namespace EmployeesAPI.Services
             _cache = cache;
         }
 
-        /// <summary>
-        /// Получение списка всех должностей.
-        /// </summary>
-        /// <returns></returns>
+        ///<inheritdoc/>
         public async Task<IEnumerable<PositionDto>> GetPositions()
         {
             List<Position> positions;
 
-            if (!_cache.TryGetValue(ChacheKeys.Positions, out positions))
+            if (!_cache.TryGetValue(CacheKeys.Positions, out positions))
             {
                 positions = await _context.Position.ToListAsync();
-                _cache.Set(ChacheKeys.Positions, positions);
+                _cache.Set(CacheKeys.Positions, positions);
             }
 
             return _mapper.Map<List<PositionDto>>(positions);

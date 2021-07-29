@@ -5,15 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace EmployeesClient.Windows
 {
@@ -22,7 +14,7 @@ namespace EmployeesClient.Windows
     /// </summary>
     public partial class AddEditSubdivisionWindow : Window
     {
-        List<SubdivisionDto> Subdivisions = new List<SubdivisionDto>();
+        private List<SubdivisionDto> Subdivisions = new List<SubdivisionDto>();
 
         public AddEditSubdivisionWindow()
         {
@@ -45,13 +37,13 @@ namespace EmployeesClient.Windows
 
             LoadData();
 
-            Subdivisions.Remove(Subdivisions.FirstOrDefault(x=>x.id == editSubdivisionDto.ID));
+            Subdivisions.Remove(Subdivisions.FirstOrDefault(x => x.id == editSubdivisionDto.ID));
             ParentComboBox.ItemsSource = Subdivisions;
 
             DataContext = editSubdivisionDto;
         }
 
-        void LoadData()
+        private void LoadData()
         {
             var client = new HttpClient();
             var response = client.GetAsync($"{App.MainUri}Subdivisions").Result;

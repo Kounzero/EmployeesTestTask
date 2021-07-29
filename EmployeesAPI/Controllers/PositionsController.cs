@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using EmployeesAPI.Entities;
-using EmployeesAPI.Models;
-using AutoMapper;
-using EmployeesAPI.Models.Dtos.Positions;
+﻿using EmployeesAPI.Models.Dtos.Positions;
 using EmployeesAPI.Services;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace EmployeesAPI.Controllers
 {

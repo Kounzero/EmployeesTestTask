@@ -1,8 +1,6 @@
-using EmployeesAPI.Entities;
+
+using EmployeesAPI.Models.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 
 namespace EmployeesAPI.Models
 {
@@ -16,11 +14,6 @@ namespace EmployeesAPI.Models
         public DatabaseContext(DbContextOptions<DatabaseContext> options)
             : base(options)
         {
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            
         }
 
         public virtual DbSet<Employee> Employee { get; set; }

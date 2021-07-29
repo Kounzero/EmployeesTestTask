@@ -1,13 +1,11 @@
 ﻿using AutoMapper;
-using EmployeesAPI.Entities;
+
 using EmployeesAPI.Models.Dtos.Employees;
 using EmployeesAPI.Models.Dtos.Genders;
 using EmployeesAPI.Models.Dtos.Positions;
 using EmployeesAPI.Models.Dtos.Subdivisions;
-using System;
-using System.Collections.Generic;
+using EmployeesAPI.Models.Entities;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace EmployeesAPI.Mappings
 {

@@ -1,21 +1,11 @@
 ﻿using EmployeesClient.Models.Employees;
 using EmployeesClient.Models.Subdivisions;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace EmployeesClient.Windows
 {
@@ -24,8 +14,8 @@ namespace EmployeesClient.Windows
     /// </summary>
     public partial class EmployeesWindow : Window
     {
-        List<SubdivisionDto> Subdivisions = new List<SubdivisionDto>();
-        List<EmployeeDto> Employees = new List<EmployeeDto>();
+        private List<SubdivisionDto> Subdivisions = new List<SubdivisionDto>();
+        private List<EmployeeDto> Employees = new List<EmployeeDto>();
 
 
         public EmployeesWindow()
@@ -35,7 +25,7 @@ namespace EmployeesClient.Windows
             RefreshSubdivisions();
         }
 
-        List<SubdivisionDto> LoadSubdivisions(int? parentId)
+        private List<SubdivisionDto> LoadSubdivisions(int? parentId)
         {
             var client = new HttpClient();
             var response = client.GetAsync($"{App.MainUri}Subdivisions/GetSubdivisions{(parentId == null ? "" : "?parentSubdivisionId=" + parentId)}").Result;
@@ -46,7 +36,7 @@ namespace EmployeesClient.Windows
             return data;
         }
 
-        void RefreshSubdivisions()
+        private void RefreshSubdivisions()
         {
             Subdivisions = LoadSubdivisions(null);
 
@@ -59,7 +49,7 @@ namespace EmployeesClient.Windows
             SubdivisionsListView.SelectedIndex = 0;
         }
 
-        void LoadEmployees(int subdivisionId)
+        private void LoadEmployees(int subdivisionId)
         {
             var client = new HttpClient();
             var response = client.GetAsync($"{App.MainUri}Employees?subdivisionId={subdivisionId}").Result;

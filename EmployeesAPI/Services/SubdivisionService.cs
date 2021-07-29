@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using EmployeesAPI.Caching;
-using EmployeesAPI.Entities;
+
 using EmployeesAPI.Models;
 using EmployeesAPI.Models.Dtos.Subdivisions;
-using Microsoft.AspNetCore.Mvc;
+using EmployeesAPI.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using System;
@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace EmployeesAPI.Services
 {
+    ///<inheritdoc cref="ISubdivisionService"/>
     public class SubdivisionService : ISubdivisionService
     {
         private readonly DatabaseContext _context;
@@ -26,15 +27,12 @@ namespace EmployeesAPI.Services
             _cache = cache;
         }
 
-        /// <summary>
-        /// Получение всех подразделений
-        /// </summary>
-        /// <returns></returns>
+        ///<inheritdoc/>
         public async Task<List<SubdivisionDto>> GetAllSubdivisions()
         {
             List<SubdivisionDto> result;
 
-            if (_cache.TryGetValue(ChacheKeys.AllSubdivisions, out result))
+            if (_cache.TryGetValue(CacheKeys.AllSubdivisions, out result))
             {
                 return result;
             }
@@ -44,20 +42,16 @@ namespace EmployeesAPI.Services
                 .SetPriority(CacheItemPriority.Normal)
                 .SetSlidingExpiration(TimeSpan.FromMinutes(5));
             result = _mapper.Map<List<SubdivisionDto>>(subdivisions).OrderBy(x => x.Title).ToList();
-            _cache.Set(ChacheKeys.AllSubdivisions, result, cacheEntryOptions);
+            _cache.Set(CacheKeys.AllSubdivisions, result, cacheEntryOptions);
 
             return result;
         }
 
-        /// <summary>
-        /// Получение всех дочерних подразделений первого уровня вложенности по идентификатору родительского
-        /// </summary>
-        /// <param name="parentSubdivisionId">Идентификатор родительского подразделения</param>
-        /// <returns></returns>
+        ///<inheritdoc/>
         public async Task<List<SubdivisionDto>> GetSubdivisions(int? parentSubdivisionId)
         {
             List<SubdivisionDto> result;
-            var chacheKey = ChacheKeys.SubdivisionsByParent + parentSubdivisionId;
+            var chacheKey = CacheKeys.SubdivisionsByParent + parentSubdivisionId;
 
             if (_cache.TryGetValue(chacheKey, out result))
             {
@@ -77,15 +71,7 @@ namespace EmployeesAPI.Services
             return result;
         }
 
-        /// <summary>
-        /// Изменение данных о подразделении
-        /// </summary>
-        /// <param name="editSubdivisionDto">Модель изменяемого подразделения</param>
-        /// <returns>Статус код выполнения функции, где:
-        /// 0 - выполнена успешно;
-        /// 1 - подразделение не найдено;
-        /// 2 - невозможно изменить родительское подразделение, т.к. целевое родительское подразделение является дочерним для изменяемого.
-        /// 3 - ошибка сохранения данных.</returns>
+        ///<inheritdoc/>
         public async Task<int> EditSubdivision(EditSubdivisionDto editSubdivisionDto)
         {
             var subdivision = await _context.Subdivision.FindAsync(editSubdivisionDto.Id);
@@ -95,12 +81,12 @@ namespace EmployeesAPI.Services
                 return 1;
             }
 
-            if (editSubdivisionDto.ParentId != null && !(await CheckSubdivisionParentingPossibility(editSubdivisionDto.Id, (int)editSubdivisionDto.ParentId)))
+            if (!editSubdivisionDto.ParentId.HasValue && !(await CheckSubdivisionParentingPossibility(editSubdivisionDto.Id, (int)editSubdivisionDto.ParentId)))
             {
                 return 2;
             }
 
-            _cache.Remove(ChacheKeys.SubdivisionsByParent + subdivision.ParentId);
+            _cache.Remove(CacheKeys.SubdivisionsByParent + subdivision.ParentId);
             subdivision.ParentId = editSubdivisionDto.ParentId;
             subdivision.Title = editSubdivisionDto.Title;
             subdivision.Description = editSubdivisionDto.Description;
@@ -114,24 +100,17 @@ namespace EmployeesAPI.Services
                 return 3;
             }
 
-            _cache.Remove(ChacheKeys.AllSubdivisions);
-            _cache.Remove(ChacheKeys.SubdivisionsByParent + editSubdivisionDto.ParentId);
-            _cache.Remove(ChacheKeys.EmployeesBySubdivision + editSubdivisionDto.Id);
+            _cache.Remove(CacheKeys.AllSubdivisions);
+            _cache.Remove(CacheKeys.SubdivisionsByParent + editSubdivisionDto.ParentId);
+            _cache.Remove(CacheKeys.EmployeesBySubdivision + editSubdivisionDto.Id);
 
             return 0;
         }
 
-        /// <summary>
-        /// Создание нового подразделения
-        /// </summary>
-        /// <param name="addSubdivisionDto">Модель создаваемого подразделения</param>
-        /// <returns>Статус код выполнения функции, где:
-        /// 0 - выполнена успешно;
-        /// 1 - указанное родительское подразделение не найдено;
-        /// 3 - ошибка сохранения данных.</returns>
+        ///<inheritdoc/>
         public async Task<int> AddSubdivision(AddSubdivisionDto addSubdivisionDto)
         {
-            if (addSubdivisionDto.ParentId != null && await _context.Subdivision.FindAsync(addSubdivisionDto.ParentId) == null)
+            if (!addSubdivisionDto.ParentId.HasValue && await _context.Subdivision.FindAsync(addSubdivisionDto.ParentId) == null)
             {
                 return 1;
             }
@@ -153,21 +132,13 @@ namespace EmployeesAPI.Services
                 return 3;
             }
 
-            _cache.Remove(ChacheKeys.AllSubdivisions);
-            _cache.Remove(ChacheKeys.SubdivisionsByParent + addSubdivisionDto.ParentId);
+            _cache.Remove(CacheKeys.AllSubdivisions);
+            _cache.Remove(CacheKeys.SubdivisionsByParent + addSubdivisionDto.ParentId);
 
             return 0;
         }
 
-        /// <summary>
-        /// Удаление подразделения
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns>Модель создаваемого подразделения</param>
-        /// <returns>Статус код выполнения функции, где:
-        /// 0 - выполнена успешно;
-        /// 1 - подразделение не найдено;
-        /// 3 - ошибка сохранения данных.</returns>
+        ///<inheritdoc/>
         public async Task<int> DeleteSubdivision(int id)
         {
             var subdivision = await _context.Subdivision.FindAsync(id);
@@ -185,8 +156,8 @@ namespace EmployeesAPI.Services
                 {
                     var forDelete = await _context.Subdivision.FindAsync(children[i].Id);
                     _context.Subdivision.Remove(forDelete);
-                    _cache.Remove(ChacheKeys.SubdivisionsByParent + children[i].ParentId);
-                    _cache.Remove(ChacheKeys.EmployeesBySubdivision + children[i].Id);
+                    _cache.Remove(CacheKeys.SubdivisionsByParent + children[i].ParentId);
+                    _cache.Remove(CacheKeys.EmployeesBySubdivision + children[i].Id);
                 }
             }
 
@@ -199,17 +170,12 @@ namespace EmployeesAPI.Services
                 return 3;
             }
 
-            _cache.Remove(ChacheKeys.AllSubdivisions);
+            _cache.Remove(CacheKeys.AllSubdivisions);
 
             return 0;
         }
 
-        /// <summary>
-        /// Метод для определения, можно ли сделать одно подразделение дочерним для другого. Необходимо для избежания циклических зависимостей подразделений
-        /// </summary>
-        /// <param name="subdivisionId">Идентификатор проверяемого подразделения</param>
-        /// <param name="targetSubdivisionId">Идентификатор целевого подразделения</param>
-        /// <returns>Возвращает true, если возможно, иначе false</returns>
+        ///<inheritdoc/>
         public async Task<bool> CheckSubdivisionParentingPossibility(int subdivisionId, int targetSubdivisionId)
         {
             var children = await GetAllSubdivisionChildren(subdivisionId);
@@ -217,11 +183,7 @@ namespace EmployeesAPI.Services
             return children.FirstOrDefault(x => x.Id == targetSubdivisionId) == null;
         }
 
-        /// <summary>
-        /// Метод для получения всех вложенных подразделений указанного подразделения
-        /// </summary>
-        /// <param name="subdivisionId">Идентификатор родительского подразделения</param>
-        /// <returns></returns>
+        ///<inheritdoc/>
         public async Task<List<SubdivisionDto>> GetAllSubdivisionChildren(int subdivisionId)
         {
             var subdivisions = new List<Subdivision>();

@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using EmployeesAPI.Entities;
-using EmployeesAPI.Models;
-using EmployeesAPI.Models.Dtos.Subdivisions;
-using AutoMapper;
-using EmployeesAPI.Models.Dtos.Employees;
+﻿using EmployeesAPI.Models.Dtos.Employees;
+using EmployeesAPI.Models.Entities;
 using EmployeesAPI.Services;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace EmployeesAPI.Controllers
 {
@@ -36,50 +29,37 @@ namespace EmployeesAPI.Controllers
         [HttpPut]
         public async Task<IActionResult> PutEmployee([FromBody] EditEmployeeDto editEmployeeDto)
         {
-            switch (await EmployeeService.EditEmployee(editEmployeeDto))
+            return await EmployeeService.EditEmployee(editEmployeeDto) switch
             {
-                case 0:
-                    return Ok();
-                case 1:
-                    return NotFound("Сотрудник не найден");
-                case 2:
-                    return BadRequest("Ошибка сохранения данных");
-
-                default:
-                    return BadRequest();
-            }
+                0 => Ok(),
+                1 => NotFound("Сотрудник не найден"),
+                2 => BadRequest("Ошибка сохранения данных"),
+                _ => BadRequest(),
+            };
         }
 
         // Post, добавление сотрудника
         [HttpPost]
         public async Task<ActionResult<Employee>> PostEmployee([FromBody] AddEmployeeDto addEmployeeDto)
         {
-            switch (await EmployeeService.AddEmployee(addEmployeeDto))
+            return await EmployeeService.AddEmployee(addEmployeeDto) switch
             {
-                case 0:
-                    return Ok();
-                case 2:
-                    return BadRequest("Ошибка сохранения данных");
-
-                default:
-                    return BadRequest();
-            }
+                0 => Ok(),
+                2 => BadRequest("Ошибка сохранения данных"),
+                _ => BadRequest(),
+            };
         }
 
         // Delete, удаление сотрудника
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEmployee(int id)
         {
-            switch (await EmployeeService.DeleteEmployee(id))
+            return await EmployeeService.DeleteEmployee(id) switch
             {
-                case 0:
-                    return Ok();
-                case 1:
-                    return NotFound("Сотрудник не найден");
-
-                default:
-                    return BadRequest();
-            }
+                0 => Ok(),
+                1 => NotFound("Сотрудник не найден"),
+                _ => BadRequest(),
+            };
         }
     }
 }
