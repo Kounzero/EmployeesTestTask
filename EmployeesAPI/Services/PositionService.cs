@@ -27,15 +27,16 @@ namespace EmployeesAPI.Services
         ///<inheritdoc/>
         public async Task<IEnumerable<PositionDto>> GetPositions()
         {
-            List<Position> positions;
+            List<PositionDto> result;
 
-            if (!_cache.TryGetValue(CacheKeys.Positions, out positions))
+            if (!_cache.TryGetValue(CacheKeys.Positions, out result))
             {
-                positions = await _context.Position.ToListAsync();
-                _cache.Set(CacheKeys.Positions, positions);
+                var positions = await _context.Position.ToListAsync();
+                result = _mapper.Map<List<PositionDto>>(positions);
+                _cache.Set(CacheKeys.Positions, result);
             }
 
-            return _mapper.Map<List<PositionDto>>(positions);
+            return result;
         }
     }
 }

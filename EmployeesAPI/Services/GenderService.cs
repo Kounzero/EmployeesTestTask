@@ -27,15 +27,16 @@ namespace EmployeesAPI.Services
         ///<inheritdoc/>
         public async Task<IEnumerable<GenderDto>> GetGenders()
         {
-            List<Gender> genders;
+            List<GenderDto> result;
 
-            if (!_cache.TryGetValue(CacheKeys.Genders, out genders))
+            if (!_cache.TryGetValue(CacheKeys.Genders, out result))
             {
-                genders = await _context.Gender.ToListAsync();
-                _cache.Set(CacheKeys.Genders, genders);
+                var genders = await _context.Gender.ToListAsync();
+                result = _mapper.Map<List<GenderDto>>(genders);
+                _cache.Set(CacheKeys.Genders, result);
             }
 
-            return _mapper.Map<List<GenderDto>>(genders);
+            return result;
         }
     }
 }

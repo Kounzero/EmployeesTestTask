@@ -38,52 +38,38 @@ namespace EmployeesAPI.Controllers
         [HttpPut]
         public async Task<IActionResult> PutSubdivision([FromBody] EditSubdivisionDto editSubdivisionDto)
         {
-            switch (await SubdivisionService.EditSubdivision(editSubdivisionDto))
+            return await SubdivisionService.EditSubdivision(editSubdivisionDto) switch
             {
-                case 0:
-                    return Ok();
-                case 1:
-                    return NotFound("Подразделение не найдено");
-                case 2:
-                    return BadRequest("Невозможно изменить родительское подразделение, т.к. целевое родительское подразделение является дочерним для изменяемого");
-                case 3:
-                    return BadRequest("Ошибка сохранения данных");
-
-                default:
-                    return BadRequest();
-            }
+                0 => Ok(),
+                1 => NotFound("Подразделение не найдено"),
+                2 => BadRequest("Невозможно изменить родительское подразделение, т.к. целевое родительское подразделение является дочерним для изменяемого"),
+                3 => BadRequest("Ошибка сохранения данных"),
+                _ => BadRequest(),
+            };
         }
 
         // Create new subdivision
         [HttpPost]
         public async Task<ActionResult<Subdivision>> PostSubdivision([FromBody] AddSubdivisionDto addSubdivisionDto)
         {
-            switch (await SubdivisionService.AddSubdivision(addSubdivisionDto))
+            return await SubdivisionService.AddSubdivision(addSubdivisionDto) switch
             {
-                case 0:
-                    return Ok();
-                case 1:
-                    return NotFound("Указанное родительское подразделение не найдено");
-
-                default:
-                    return BadRequest();
-            }
+                0 => Ok(),
+                1 => NotFound("Указанное родительское подразделение не найдено"),
+                _ => BadRequest(),
+            };
         }
 
         // Delete subdivision
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSubdivision(int id)
         {
-            switch (await SubdivisionService.DeleteSubdivision(id))
+            return await SubdivisionService.DeleteSubdivision(id) switch
             {
-                case 0:
-                    return Ok();
-                case 1:
-                    return NotFound("Подразделение не найдено");
-
-                default:
-                    return BadRequest();
-            }
+                0 => Ok(),
+                1 => NotFound("Подразделение не найдено"),
+                _ => BadRequest(),
+            };
         }
     }
 }

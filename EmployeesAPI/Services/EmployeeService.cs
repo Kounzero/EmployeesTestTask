@@ -80,7 +80,7 @@ namespace EmployeesAPI.Services
         ///<inheritdoc/>
         public async Task<int> EditEmployee(EditEmployeeDto editEmployeeDto)
         {
-            var employee = await _context.Employee.FirstOrDefaultAsync(x => x.Id == editEmployeeDto.Id);
+            var employee = await _context.Employee.FindAsync(editEmployeeDto.Id);
 
             if (employee == null)
             {

@@ -9,6 +9,9 @@ using System.Linq;
 
 namespace EmployeesAPI.Mappings
 {
+    /// <summary>
+    /// Профили для преобразования моделей данных
+    /// </summary>
     public class MappingProfile : Profile
     {
         public MappingProfile()
