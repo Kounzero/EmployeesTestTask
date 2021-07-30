@@ -27,18 +27,21 @@ namespace EmployeesClient.Services
         /// Изменение данных о подразделении
         /// </summary>
         /// <param name="editSubdivisionDto">Модель изменяемого подразделения</param>
+        /// <returns>Ответ сервера</returns>
         public Task<HttpResponseMessage> EditSubdivision(EditSubdivisionDto editSubdivisionDto);
 
         /// <summary>
         /// Создание нового подразделения
         /// </summary>
         /// <param name="addSubdivisionDto">Модель создаваемого подразделения</param>
+        /// <returns>Ответ сервера</returns>
         public Task<HttpResponseMessage> AddSubdivision(AddSubdivisionDto addSubdivisionDto);
 
         /// <summary>
         /// Удаление подразделения
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">Идентификатор удаляемого сотрудника</param>
+        /// <returns>Ответ сервера</returns>
         public Task<HttpResponseMessage> DeleteSubdivision(int id);
     }
 }

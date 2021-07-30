@@ -9,8 +9,10 @@ using System.Threading.Tasks;
 
 namespace EmployeesClient.Services
 {
+    /// <inheritdoc cref="IGenderService"/>
     public class GenderService : IGenderService
     {
+        /// <inheritdoc/>
         public async Task<IEnumerable<GenderDto>> GetGenders()
         {
             var client = new HttpClient();

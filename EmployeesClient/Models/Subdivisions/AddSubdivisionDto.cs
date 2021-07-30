@@ -5,8 +5,13 @@
     /// </summary>
     public class AddSubdivisionDto
     {
+        /// <inheritdoc cref="SubdivisionDto.Title"/>
         public string Title { get; set; }
+
+        /// <inheritdoc cref="SubdivisionDto.Description"/>
         public string Description { get; set; }
-        public int? ParentSubdivisionId { get; set; }
+
+        /// <inheritdoc cref="SubdivisionDto.ParentId"/>
+        public int? ParentId { get; set; }
     }
 }

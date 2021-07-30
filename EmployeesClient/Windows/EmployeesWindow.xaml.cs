@@ -203,7 +203,7 @@ namespace EmployeesClient.Windows
                 {
                     Id = subdivisionDto.Id,
                     Description = subdivisionDto.Description,
-                    ParentSubdivisionId = subdivisionDto.ParentSubdivisionID,
+                    ParentId = subdivisionDto.ParentId,
                     Title = subdivisionDto.Title
                 };
 

@@ -9,8 +9,10 @@ using System.Threading.Tasks;
 
 namespace EmployeesClient.Services
 {
+        /// <inheritdoc cref="ISubdivisionService"/>
     public class SubdivisionService : ISubdivisionService
     {
+        /// <inheritdoc/>
         public async Task<HttpResponseMessage> AddSubdivision(AddSubdivisionDto addSubdivisionDto)
         {
             var client = new HttpClient();
@@ -25,6 +27,7 @@ namespace EmployeesClient.Services
             return response;
         }
 
+        /// <inheritdoc/>
         public async Task<HttpResponseMessage> DeleteSubdivision(int id)
         {
             var client = new HttpClient();
@@ -33,6 +36,7 @@ namespace EmployeesClient.Services
             return response;
         }
 
+        /// <inheritdoc/>
         public async Task<HttpResponseMessage> EditSubdivision(EditSubdivisionDto editSubdivisionDto)
         {
             var client = new HttpClient();
@@ -47,6 +51,7 @@ namespace EmployeesClient.Services
             return response;
         }
 
+        /// <inheritdoc/>
         public async Task<List<SubdivisionDto>> GetAllSubdivisions()
         {
             var client = new HttpClient();
@@ -62,6 +67,7 @@ namespace EmployeesClient.Services
             return subdivisions;
         }
 
+        /// <inheritdoc/>
         public async Task<List<SubdivisionDto>> GetSubdivisions(int? parentSubdivisionId)
         {
             var client = new HttpClient();

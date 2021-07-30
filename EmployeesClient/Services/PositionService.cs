@@ -9,8 +9,10 @@ using System.Threading.Tasks;
 
 namespace EmployeesClient.Services
 {
+        /// <inheritdoc cref="IPositionService"/>
     public class PositionService : IPositionService
     {
+        /// <inheritdoc/>
         public async Task<IEnumerable<PositionDto>> GetPositions()
         {
             var client = new HttpClient();

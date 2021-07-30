@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace EmployeesClient.Services
 {
+    /// <inheritdoc cref="IEmployeeService"/>
     public class EmployeeService : IEmployeeService
     {
         public async Task<HttpResponseMessage> AddEmployee(AddEmployeeDto addEmployeeDto)
@@ -25,6 +26,7 @@ namespace EmployeesClient.Services
             return response;
         }
 
+        /// <inheritdoc/>
         public async Task<HttpResponseMessage> DeleteEmployee(int id)
         {
             var client = new HttpClient();
@@ -33,6 +35,7 @@ namespace EmployeesClient.Services
             return response;
         }
 
+        /// <inheritdoc/>
         public async Task<HttpResponseMessage> EditEmployee(EditEmployeeDto editEmployeeDto)
         {
             var client = new HttpClient();
@@ -47,6 +50,7 @@ namespace EmployeesClient.Services
             return response;
         }
 
+        /// <inheritdoc/>
         public async Task<List<EmployeeDto>> GetEmployees(int subdivisionId)
         {
             var client = new HttpClient();
