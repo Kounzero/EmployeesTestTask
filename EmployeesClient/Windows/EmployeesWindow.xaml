@@ -9,7 +9,7 @@
         Height="450"
         Width="800"
         MinHeight="300"
-        MinWidth="700">
+        MinWidth="700" Loaded="Window_Loaded">
     <Window.Resources>
         <DataTemplate x:Key="SubdivisionItemTemplate">
             <StackPanel Orientation="Horizontal"

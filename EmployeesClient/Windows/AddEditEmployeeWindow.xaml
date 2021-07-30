@@ -73,7 +73,7 @@
                   Grid.Row="2"
                   Margin="5"
                   VerticalAlignment="Center"
-                  SelectedValue="{Binding GenderID}"
+                  SelectedValue="{Binding GenderId}"
                   SelectedValuePath="Id"
                   DisplayMemberPath="Title" />
         <ComboBox x:Name="PositionsCombobox"
@@ -81,7 +81,7 @@
                   Grid.Row="3"
                   Margin="5"
                   VerticalAlignment="Center"
-                  SelectedValue="{Binding PositionID}"
+                  SelectedValue="{Binding PositionId}"
                   SelectedValuePath="Id"
                   DisplayMemberPath="Title" />
         <CheckBox x:Name="HasDrivindLicenseCheckBox"
@@ -95,7 +95,7 @@
                   Grid.Row="5"
                   Margin="5"
                   VerticalAlignment="Center"
-                  SelectedValue="{Binding SubdivisionID}"
+                  SelectedValue="{Binding SubdivisionId}"
                   SelectedValuePath="Id"
                   DisplayMemberPath="Title" />
 

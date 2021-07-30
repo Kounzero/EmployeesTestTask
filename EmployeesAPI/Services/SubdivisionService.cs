@@ -81,7 +81,7 @@ namespace EmployeesAPI.Services
                 return 1;
             }
 
-            if (!editSubdivisionDto.ParentId.HasValue && !(await CheckSubdivisionParentingPossibility(editSubdivisionDto.Id, (int)editSubdivisionDto.ParentId)))
+            if (editSubdivisionDto.ParentId.HasValue && !(await CheckSubdivisionParentingPossibility(editSubdivisionDto.Id, (int)editSubdivisionDto.ParentId)))
             {
                 return 2;
             }

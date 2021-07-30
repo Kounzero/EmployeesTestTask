@@ -2,14 +2,13 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace EmployeesClient.Services
 {
-        /// <inheritdoc cref="ISubdivisionService"/>
+    /// <inheritdoc cref="ISubdivisionService"/>
     public class SubdivisionService : ISubdivisionService
     {
         /// <inheritdoc/>
@@ -63,7 +62,7 @@ namespace EmployeesClient.Services
             }
 
             var subdivisions = JsonConvert.DeserializeObject<List<SubdivisionDto>>(response.Content.ReadAsStringAsync().Result);
-            
+
             return subdivisions;
         }
 

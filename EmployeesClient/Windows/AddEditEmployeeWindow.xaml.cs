@@ -1,13 +1,7 @@
 ﻿using EmployeesClient.Models.Employees;
-using EmployeesClient.Models.Genders;
-using EmployeesClient.Models.Positions;
-using EmployeesClient.Models.Subdivisions;
 using EmployeesClient.Services;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Windows;
 
 namespace EmployeesClient.Windows
@@ -77,11 +71,11 @@ namespace EmployeesClient.Windows
             try
             {
                 var isDataIsValid =
-                    string.IsNullOrEmpty(FullNameTextBox.Text) ||
-                    BirthDatePicker.SelectedDate == null ||
-                    GendersCombobox.SelectedIndex == -1 ||
-                    PositionsCombobox.SelectedIndex == -1 ||
-                    SubdivisionsCombobox.SelectedIndex == -1;
+                    !string.IsNullOrEmpty(FullNameTextBox.Text) ||
+                    !BirthDatePicker.SelectedDate.HasValue ||
+                    GendersCombobox.SelectedIndex != -1 ||
+                    PositionsCombobox.SelectedIndex != -1 ||
+                    SubdivisionsCombobox.SelectedIndex != -1;
 
                 if (!isDataIsValid)
                 {
@@ -103,7 +97,7 @@ namespace EmployeesClient.Windows
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    MessageBox.Show($"При обновлении данных произошла следующая ошибка:\n{response.StatusCode} - {response.Content.ReadAsStringAsync().Result}", 
+                    MessageBox.Show($"При обновлении данных произошла следующая ошибка:\n{response.StatusCode} - {response.Content.ReadAsStringAsync().Result}",
                         "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
 
                     return;

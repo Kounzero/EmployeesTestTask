@@ -2,7 +2,6 @@
 using EmployeesAPI.Caching;
 using EmployeesAPI.Models;
 using EmployeesAPI.Models.Dtos.Positions;
-using EmployeesAPI.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using System.Collections.Generic;

@@ -1,10 +1,9 @@
 ﻿using EmployeesClient.Models.Employees;
 using EmployeesClient.Models.Subdivisions;
 using EmployeesClient.Services;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -26,11 +25,14 @@ namespace EmployeesClient.Windows
 
             EmployeeService = new EmployeeService();
             SubdivisionService = new SubdivisionService();
-
-            RefreshSubdivisions();
         }
 
-        private async void RefreshSubdivisions()
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            await RefreshSubdivisions();
+        }
+
+        private async Task RefreshSubdivisions()
         {
             try
             {
@@ -94,7 +96,7 @@ namespace EmployeesClient.Windows
             }
         }
 
-        private async void OpenSubdivision(SubdivisionDto parentSubdivision, int startIndex)
+        private async Task OpenSubdivision(SubdivisionDto parentSubdivision, int startIndex)
         {
             var children = await SubdivisionService.GetSubdivisions(parentSubdivision.Id);
 
@@ -150,7 +152,7 @@ namespace EmployeesClient.Windows
 
                 if (parentSubdivision.Opening)
                 {
-                    OpenSubdivision(parentSubdivision, startIndex);
+                    await OpenSubdivision(parentSubdivision, startIndex);
                 }
                 else
                 {
@@ -173,13 +175,13 @@ namespace EmployeesClient.Windows
             EditEmployee();
         }
 
-        private void BtnAddSubdivision_Click(object sender, RoutedEventArgs e)
+        private async void BtnAddSubdivision_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 if (new AddEditSubdivisionWindow().ShowDialog().Value)
                 {
-                    RefreshSubdivisions();
+                    await RefreshSubdivisions();
                 }
             }
             catch (Exception error)
@@ -190,7 +192,7 @@ namespace EmployeesClient.Windows
             }
         }
 
-        private void BtnEditSubdivision_Click(object sender, RoutedEventArgs e)
+        private async void BtnEditSubdivision_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -209,7 +211,7 @@ namespace EmployeesClient.Windows
 
                 if (new AddEditSubdivisionWindow(editableSubdivision).ShowDialog().Value)
                 {
-                    RefreshSubdivisions();
+                    await RefreshSubdivisions();
                 }
             }
             catch (Exception error)
@@ -248,7 +250,7 @@ namespace EmployeesClient.Windows
 
                 MessageBox.Show("Удаление успешно", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                RefreshSubdivisions();
+                await RefreshSubdivisions();
             }
             catch (Exception error)
             {

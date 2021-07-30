@@ -55,7 +55,7 @@
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center">
             <ComboBox x:Name="ParentComboBox"
-                      SelectedValue="{Binding ParentSubdivisionID}"
+                      SelectedValue="{Binding ParentId}"
                       SelectedValuePath="Id"
                       DisplayMemberPath="Title"
                       VerticalAlignment="Center"

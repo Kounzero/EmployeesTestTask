@@ -7,7 +7,7 @@ namespace EmployeesAPI.Models.Dtos.Employees
     /// <summary>
     /// Объект передачи данных при добавлении сотрудника
     /// </summary>
-    [AutoMap(typeof(Employee), ReverseMap = true)]
+    [AutoMap(typeof(Employee))]
     public class AddEmployeeDto
     {
         ///<inheritdoc cref="Employee.FullName"/>

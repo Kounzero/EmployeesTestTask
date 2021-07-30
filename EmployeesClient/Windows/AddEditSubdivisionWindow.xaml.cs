@@ -1,12 +1,9 @@
 ﻿using EmployeesClient.Models.Subdivisions;
 using EmployeesClient.Services;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace EmployeesClient.Windows
@@ -42,12 +39,14 @@ namespace EmployeesClient.Windows
             try
             {
                 SubdivisionService = new SubdivisionService();
-                ParentComboBox.ItemsSource = await SubdivisionService.GetAllSubdivisions();
+                Subdivisions = await SubdivisionService.GetAllSubdivisions();
 
                 if (DataContext is EditSubdivisionDto editSubdivisionDto)
                 {
-                    ParentComboBox.Items.Remove(editSubdivisionDto);
+                    Subdivisions.Remove(Subdivisions.FirstOrDefault(s => s.Id == editSubdivisionDto.Id));
                 }
+
+                ParentComboBox.ItemsSource = Subdivisions;
             }
             catch (Exception error)
             {

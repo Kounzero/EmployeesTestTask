@@ -32,12 +32,6 @@ namespace EmployeesAPI.Services
         public async Task<List<EmployeeDto>> GetEmployees(int subdivisionId)
         {
             List<EmployeeDto> result;
-            var chacheKey = CacheKeys.EmployeesBySubdivision + subdivisionId;
-
-            if (_cache.TryGetValue(chacheKey, out result))
-            {
-                return result;
-            }
 
             var subdivisions = new List<Subdivision>();
             subdivisions.Add(await _context.Subdivision
@@ -66,13 +60,20 @@ namespace EmployeesAPI.Services
 
             foreach (var subdivision in subdivisions)
             {
-                result.AddRange(_mapper.Map<List<EmployeeDto>>(subdivision.Employees));
-            }
+                var chacheKey = CacheKeys.EmployeesBySubdivision + subdivision.Id;
+                List<EmployeeDto> employees;
 
-            var cacheEntryOptions = new MemoryCacheEntryOptions()
-                .SetPriority(CacheItemPriority.Normal)
-                .SetSlidingExpiration(TimeSpan.FromMinutes(15));
-            _cache.Set(chacheKey, result);
+                if (!_cache.TryGetValue(chacheKey, out employees))
+                {
+                    employees = _mapper.Map<List<EmployeeDto>>(subdivision.Employees);
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetPriority(CacheItemPriority.Normal)
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(15));
+                    _cache.Set(chacheKey, employees);
+                }
+
+                result.AddRange(employees);
+            }
 
             return result;
         }
@@ -98,6 +99,7 @@ namespace EmployeesAPI.Services
             try
             {
                 await _context.SaveChangesAsync();
+
                 _cache.Remove(CacheKeys.EmployeesBySubdivision + editEmployeeDto.SubdivisionId);
             }
             catch (DbUpdateConcurrencyException)
@@ -111,7 +113,17 @@ namespace EmployeesAPI.Services
         ///<inheritdoc/>
         public async Task<int> AddEmployee(AddEmployeeDto addEmployeeDto)
         {
-            _context.Employee.Add(_mapper.Map<Employee>(addEmployeeDto));
+            var newEmployee = new Employee()
+            {
+                FullName = addEmployeeDto.FullName,
+                BirthDate = addEmployeeDto.BirthDate,
+                GenderId = addEmployeeDto.GenderId,
+                PositionId = addEmployeeDto.PositionId,
+                SubdivisionId = addEmployeeDto.SubdivisionId,
+                HasDrivingLicense = addEmployeeDto.HasDrivingLicense
+            };
+
+            _context.Employee.Add(newEmployee);
 
             try
             {

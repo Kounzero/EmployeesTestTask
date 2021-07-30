@@ -1,15 +1,12 @@
 ﻿using EmployeesClient.Models.Positions;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace EmployeesClient.Services
 {
-        /// <inheritdoc cref="IPositionService"/>
+    /// <inheritdoc cref="IPositionService"/>
     public class PositionService : IPositionService
     {
         /// <inheritdoc/>

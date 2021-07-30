@@ -53,3 +53,4 @@ C:\Users\Koun\source\repos\EmployeesTestTask\EmployeesClient\obj\Debug\net5.0-wi
 C:\Users\Koun\source\repos\EmployeesTestTask\EmployeesClient\obj\Debug\net5.0-windows\EmployeesClient.pdb
 C:\Users\Koun\source\repos\EmployeesTestTask\EmployeesClient\obj\Debug\net5.0-windows\EmployeesClient.genruntimeconfig.cache
 C:\Users\Koun\source\repos\EmployeesTestTask\EmployeesClient\bin\Debug\net5.0-windows\AppConfig\appconfig.json
+C:\Users\Koun\source\repos\EmployeesTestTask\EmployeesClient\obj\Debug\net5.0-windows\EmployeesClient.csproj.AssemblyReference.cache
