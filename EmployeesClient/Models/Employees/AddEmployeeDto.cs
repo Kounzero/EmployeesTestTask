@@ -2,6 +2,9 @@
 
 namespace EmployeesClient.Models.Employees
 {
+    /// <summary>
+    /// Модель для работы с данными о сотруднике при добавлении нового
+    /// </summary>
     public class AddEmployeeDto
     {
         public string FullName { get; set; }

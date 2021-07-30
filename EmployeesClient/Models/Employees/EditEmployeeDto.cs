@@ -2,6 +2,9 @@
 
 namespace EmployeesClient.Models.Employees
 {
+    /// <summary>
+    /// Модель для работы с данными о сотруднике при изменении
+    /// </summary>
     public class EditEmployeeDto
     {
         public int Id { get; set; }

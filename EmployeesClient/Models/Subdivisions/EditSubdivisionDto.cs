@@ -1,5 +1,8 @@
 ﻿namespace EmployeesClient.Models.Subdivisions
 {
+    /// <summary>
+    /// Модель для работы с данными о подразделении при измении
+    /// </summary>
     public class EditSubdivisionDto
     {
         public int Id { get; set; }

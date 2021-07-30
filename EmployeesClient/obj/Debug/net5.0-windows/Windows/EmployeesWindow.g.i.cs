@@ -117,7 +117,7 @@ namespace EmployeesClient.Windows {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/EmployeesClient;component/windows/employeeswindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/EmployeesClient;V1.0.0.0;component/windows/employeeswindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Windows\EmployeesWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

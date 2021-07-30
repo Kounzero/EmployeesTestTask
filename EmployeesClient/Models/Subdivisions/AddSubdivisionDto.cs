@@ -1,5 +1,8 @@
 ﻿namespace EmployeesClient.Models.Subdivisions
 {
+    /// <summary>
+    /// Модель для работы с данными о подразделении при добавлении
+    /// </summary>
     public class AddSubdivisionDto
     {
         public string Title { get; set; }

@@ -43,10 +43,16 @@ namespace EmployeesClient.Windows
             {
                 SubdivisionService = new SubdivisionService();
                 ParentComboBox.ItemsSource = await SubdivisionService.GetAllSubdivisions();
-                ParentComboBox.Items.Remove(Subdivisions.FirstOrDefault(x => x.Id == (DataContext as EditSubdivisionDto).Id));
+
+                if (DataContext is EditSubdivisionDto editSubdivisionDto)
+                {
+                    ParentComboBox.Items.Remove(editSubdivisionDto);
+                }
             }
-            catch (InvalidOperationException)
+            catch (Exception error)
             {
+                MessageBox.Show($"Неизвестная ошибка. Сообщение:\n{error.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+
                 return;
             }
         }

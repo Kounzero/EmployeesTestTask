@@ -3,11 +3,14 @@ using System.Windows;
 
 namespace EmployeesClient.Models.Subdivisions
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class SubdivisionDto
     {
         public SubdivisionDto()
         {
-            Opened = false;
+            Opening = false;
             LeftMargin = 0;
         }
 
@@ -21,7 +24,7 @@ namespace EmployeesClient.Models.Subdivisions
         public Visibility ShowedVisibility { get { return HasChildren ? Visibility.Visible : Visibility.Hidden; } }
         public string MarginForDisplay { get { return $"{LeftMargin} 0 0 0"; } }
         public int LeftMargin { get; set; }
-        public bool Opened { get; set; }
-        public string BtnDisplayContent { get { return Opened ? "v" : ">"; } }
+        public bool Opening { get; set; }
+        public string BtnDisplayContent { get { return Opening ? "v" : ">"; } }
     }
 }
