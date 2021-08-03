@@ -13,13 +13,11 @@ namespace EmployeesClient.Services
     {
         public async Task<HttpResponseMessage> AddEmployee(AddEmployeeDto addEmployeeDto)
         {
-            var client = new HttpClient();
-
-            var response = await client.SendAsync(new HttpRequestMessage()
+            var response = await App.Client.SendAsync(new HttpRequestMessage()
             {
                 Content = new StringContent(JsonConvert.SerializeObject(addEmployeeDto), Encoding.UTF8, "application/json"),
                 Method = HttpMethod.Post,
-                RequestUri = new Uri($"{App.AppConfig.GetCurrentConnectionString()}Employees")
+                RequestUri = new Uri($"{App.AppConfig.GetConnectionString()}Employees")
             });
 
             return response;
@@ -28,8 +26,7 @@ namespace EmployeesClient.Services
         /// <inheritdoc/>
         public async Task<HttpResponseMessage> DeleteEmployee(int id)
         {
-            var client = new HttpClient();
-            var response = await client.DeleteAsync($"{App.AppConfig.GetCurrentConnectionString()}Employees/{id}");
+            var response = await App.Client.DeleteAsync($"{App.AppConfig.GetConnectionString()}Employees/{id}");
 
             return response;
         }
@@ -37,13 +34,11 @@ namespace EmployeesClient.Services
         /// <inheritdoc/>
         public async Task<HttpResponseMessage> EditEmployee(EditEmployeeDto editEmployeeDto)
         {
-            var client = new HttpClient();
-
-            var response = await client.SendAsync(new HttpRequestMessage()
+            var response = await App.Client.SendAsync(new HttpRequestMessage()
             {
                 Content = new StringContent(JsonConvert.SerializeObject(editEmployeeDto), Encoding.UTF8, "application/json"),
                 Method = HttpMethod.Put,
-                RequestUri = new Uri($"{App.AppConfig.GetCurrentConnectionString()}Employees")
+                RequestUri = new Uri($"{App.AppConfig.GetConnectionString()}Employees")
             });
 
             return response;
@@ -52,8 +47,7 @@ namespace EmployeesClient.Services
         /// <inheritdoc/>
         public async Task<List<EmployeeDto>> GetEmployees(int subdivisionId)
         {
-            var client = new HttpClient();
-            var response = await client.GetAsync($"{App.AppConfig.GetCurrentConnectionString()}Employees?subdivisionId={subdivisionId}");
+            var response = await App.Client.GetAsync($"{App.AppConfig.GetConnectionString()}Employees?subdivisionId={subdivisionId}");
             var responseString = await response.Content.ReadAsStringAsync();
             var employees = JsonConvert.DeserializeObject<List<EmployeeDto>>(responseString);
 

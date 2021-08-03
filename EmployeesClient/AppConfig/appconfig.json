@@ -1,5 +1,3 @@
 {
-  "ConnectionStrings": [
-    "http://localhost:5002/api/"
-  ]
+  "ConnectionString": "http://localhost:5002/api/"
 }

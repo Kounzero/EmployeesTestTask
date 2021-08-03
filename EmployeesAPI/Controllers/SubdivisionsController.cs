@@ -40,10 +40,10 @@ namespace EmployeesAPI.Controllers
         {
             return await SubdivisionService.EditSubdivision(editSubdivisionDto) switch
             {
-                0 => Ok(),
-                1 => NotFound("Подразделение не найдено"),
-                2 => BadRequest("Невозможно изменить родительское подразделение, т.к. целевое родительское подразделение является дочерним для изменяемого"),
-                3 => BadRequest("Ошибка сохранения данных"),
+                ServiceResult.Ok => Ok(),
+                ServiceResult.NotFound => NotFound("Подразделение не найдено"),
+                ServiceResult.DataProcessionError => BadRequest("Невозможно изменить родительское подразделение, т.к. целевое родительское подразделение является дочерним для изменяемого"),
+                ServiceResult.DataSavingError => BadRequest("Ошибка сохранения данных"),
                 _ => BadRequest(),
             };
         }
@@ -54,8 +54,9 @@ namespace EmployeesAPI.Controllers
         {
             return await SubdivisionService.AddSubdivision(addSubdivisionDto) switch
             {
-                0 => Ok(),
-                1 => NotFound("Указанное родительское подразделение не найдено"),
+                ServiceResult.Ok => Ok(),
+                ServiceResult.NotFound => NotFound("Указанное родительское подразделение не найдено"),
+                ServiceResult.DataSavingError => BadRequest("ошибка сохранения данных"),
                 _ => BadRequest(),
             };
         }
@@ -66,8 +67,9 @@ namespace EmployeesAPI.Controllers
         {
             return await SubdivisionService.DeleteSubdivision(id) switch
             {
-                0 => Ok(),
-                1 => NotFound("Подразделение не найдено"),
+                ServiceResult.Ok => Ok(),
+                ServiceResult.NotFound => NotFound("Подразделение не найдено"),
+                ServiceResult.DataSavingError => BadRequest("ошибка сохранения данных"),
                 _ => BadRequest(),
             };
         }

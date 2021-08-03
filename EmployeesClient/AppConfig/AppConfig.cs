@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace EmployeesClient.AppConfig
+﻿namespace EmployeesClient.AppConfig
 {
     /// <summary>
     /// Модель конфигурации приложения
@@ -10,15 +8,15 @@ namespace EmployeesClient.AppConfig
         /// <summary>
         /// Список строк подключения
         /// </summary>
-        public List<string> ConnectionStrings { get; set; }
+        public string ConnectionString { get; set; }
 
         /// <summary>
         /// Метод для получения актуальной строки подключения
         /// </summary>
         /// <returns></returns>
-        public string GetCurrentConnectionString()
+        public string GetConnectionString()
         {
-            return ConnectionStrings[0];
+            return ConnectionString;
         }
     }
 }

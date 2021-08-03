@@ -30,5 +30,10 @@
         /// </summary>
         public static string EmployeesBySubdivision { get { return "_EmployeesBySubdivision_"; } }
 
+        /// <summary>
+        /// Все дочерние подразделения, включая вложенные
+        /// </summary>
+        public static string SubdivisionsAllChildren { get { return "_SubdivisionsAllChildren_"; } }
+
     }
 }

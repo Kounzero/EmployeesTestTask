@@ -31,24 +31,18 @@ namespace EmployeesAPI.Services
         ///<inheritdoc/>
         public async Task<List<EmployeeDto>> GetEmployees(int subdivisionId)
         {
-            List<EmployeeDto> result;
-
-            var subdivisions = new List<Subdivision>();
-            subdivisions.Add(await _context.Subdivision
+            var allSubdovisions = await _context.Subdivision
                 .Include(x => x.Subdivisions)
                 .Include(x => x.Employees).ThenInclude(x => x.Position)
                 .Include(x => x.Employees).ThenInclude(x => x.Gender)
-                .FirstOrDefaultAsync(x => x.Id == subdivisionId));
+                .ToListAsync();
 
+            var subdivisions = new List<Subdivision>();
+            subdivisions.Add(allSubdovisions.FirstOrDefault(x => x.Id == subdivisionId));
 
             for (int i = 0; i < subdivisions.Count; i++)
             {
-                var children = await _context.Subdivision
-                    .Where(x => x.ParentId == subdivisions[i].Id)
-                    .Include(x => x.Subdivisions)
-                    .Include(x => x.Employees).ThenInclude(x => x.Position)
-                    .Include(x => x.Employees).ThenInclude(x => x.Gender)
-                    .ToListAsync();
+                var children = allSubdovisions.Where(x => x.ParentId == subdivisions[i].Id);
 
                 if (children.Any())
                 {
@@ -56,14 +50,13 @@ namespace EmployeesAPI.Services
                 }
             }
 
-            result = new List<EmployeeDto>();
+            var result = new List<EmployeeDto>();
 
             foreach (var subdivision in subdivisions)
             {
                 var chacheKey = CacheKeys.EmployeesBySubdivision + subdivision.Id;
-                List<EmployeeDto> employees;
 
-                if (!_cache.TryGetValue(chacheKey, out employees))
+                if (!_cache.TryGetValue(chacheKey, out List<EmployeeDto> employees))
                 {
                     employees = _mapper.Map<List<EmployeeDto>>(subdivision.Employees);
                     var cacheEntryOptions = new MemoryCacheEntryOptions()
@@ -79,13 +72,13 @@ namespace EmployeesAPI.Services
         }
 
         ///<inheritdoc/>
-        public async Task<int> EditEmployee(EditEmployeeDto editEmployeeDto)
+        public async Task<ServiceResult> EditEmployee(EditEmployeeDto editEmployeeDto)
         {
             var employee = await _context.Employee.FindAsync(editEmployeeDto.Id);
 
             if (employee == null)
             {
-                return 1;
+                return ServiceResult.NotFound;
             }
 
             _cache.Remove(CacheKeys.EmployeesBySubdivision + employee.SubdivisionId);
@@ -104,14 +97,14 @@ namespace EmployeesAPI.Services
             }
             catch (DbUpdateConcurrencyException)
             {
-                return 2;
+                return ServiceResult.DataProcessionError;
             }
 
-            return 0;
+            return ServiceResult.Ok;
         }
 
         ///<inheritdoc/>
-        public async Task<int> AddEmployee(AddEmployeeDto addEmployeeDto)
+        public async Task<ServiceResult> AddEmployee(AddEmployeeDto addEmployeeDto)
         {
             var newEmployee = new Employee()
             {
@@ -132,27 +125,27 @@ namespace EmployeesAPI.Services
             }
             catch (DbUpdateConcurrencyException)
             {
-                return 2;
+                return ServiceResult.DataProcessionError;
             }
 
-            return 0;
+            return ServiceResult.Ok;
         }
 
         ///<inheritdoc/>
-        public async Task<int> DeleteEmployee(int id)
+        public async Task<ServiceResult> DeleteEmployee(int id)
         {
             var employee = await _context.Employee.FindAsync(id);
 
             if (employee == null)
             {
-                return 1;
+                return ServiceResult.NotFound;
             }
 
             _context.Employee.Remove(employee);
             await _context.SaveChangesAsync();
             _cache.Remove(CacheKeys.EmployeesBySubdivision + employee.SubdivisionId);
 
-            return 0;
+            return ServiceResult.Ok;
         }
     }
 }

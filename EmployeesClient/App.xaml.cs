@@ -1,6 +1,7 @@
 ﻿using EmployeesClient.Windows;
 using Newtonsoft.Json;
 using System.IO;
+using System.Net.Http;
 using System.Windows;
 
 namespace EmployeesClient
@@ -11,6 +12,7 @@ namespace EmployeesClient
     public partial class App : Application
     {
         public static AppConfig.AppConfig AppConfig;
+        public static HttpClient Client;
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
@@ -30,6 +32,8 @@ namespace EmployeesClient
         {
             try
             {
+                Client = new HttpClient();
+
                 var configurationString = File.ReadAllText("./AppConfig/appconfig.json");
                 var configuration = JsonConvert.DeserializeObject<AppConfig.AppConfig>(configurationString);
 

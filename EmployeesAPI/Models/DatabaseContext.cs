@@ -14,6 +14,7 @@ namespace EmployeesAPI.Models
         public DatabaseContext(DbContextOptions<DatabaseContext> options)
             : base(options)
         {
+
         }
 
         public virtual DbSet<Employee> Employee { get; set; }

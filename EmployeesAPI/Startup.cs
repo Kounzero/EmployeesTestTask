@@ -22,9 +22,13 @@ namespace EmployeesAPI
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<Models.DatabaseContext>(x =>
-                x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
-            );
+            services.AddDbContext<Models.DatabaseContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                options.EnableDetailedErrors();
+                options.EnableSensitiveDataLogging();
+                options.EnableServiceProviderCaching();
+            });
 
             services.AddControllers();
 

@@ -31,9 +31,9 @@ namespace EmployeesAPI.Controllers
         {
             return await EmployeeService.EditEmployee(editEmployeeDto) switch
             {
-                0 => Ok(),
-                1 => NotFound("Сотрудник не найден"),
-                2 => BadRequest("Ошибка сохранения данных"),
+                ServiceResult.Ok => Ok(),
+                ServiceResult.NotFound => NotFound("Сотрудник не найден"),
+                ServiceResult.DataSavingError => BadRequest("Ошибка сохранения данных"),
                 _ => BadRequest(),
             };
         }
@@ -44,8 +44,8 @@ namespace EmployeesAPI.Controllers
         {
             return await EmployeeService.AddEmployee(addEmployeeDto) switch
             {
-                0 => Ok(),
-                2 => BadRequest("Ошибка сохранения данных"),
+                ServiceResult.Ok => Ok(),
+                ServiceResult.DataSavingError => BadRequest("Ошибка сохранения данных"),
                 _ => BadRequest(),
             };
         }
@@ -56,8 +56,9 @@ namespace EmployeesAPI.Controllers
         {
             return await EmployeeService.DeleteEmployee(id) switch
             {
-                0 => Ok(),
-                1 => NotFound("Сотрудник не найден"),
+                ServiceResult.Ok => Ok(),
+                ServiceResult.NotFound => NotFound("Сотрудник не найден"),
+                ServiceResult.DataSavingError => BadRequest("ошибка сохранения данных"),
                 _ => BadRequest(),
             };
         }

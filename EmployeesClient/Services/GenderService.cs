@@ -12,8 +12,7 @@ namespace EmployeesClient.Services
         /// <inheritdoc/>
         public async Task<IEnumerable<GenderDto>> GetGenders()
         {
-            var client = new HttpClient();
-            var response = await client.GetAsync($"{App.AppConfig.GetCurrentConnectionString()}Genders");
+            var response = await App.Client.GetAsync($"{App.AppConfig.GetConnectionString()}Genders");
 
             if (!response.IsSuccessStatusCode)
             {

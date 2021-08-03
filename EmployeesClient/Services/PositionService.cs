@@ -12,8 +12,7 @@ namespace EmployeesClient.Services
         /// <inheritdoc/>
         public async Task<IEnumerable<PositionDto>> GetPositions()
         {
-            var client = new HttpClient();
-            var response = await client.GetAsync($"{App.AppConfig.GetCurrentConnectionString()}Positions");
+            var response = await App.Client.GetAsync($"{App.AppConfig.GetConnectionString()}Positions");
 
             if (!response.IsSuccessStatusCode)
             {

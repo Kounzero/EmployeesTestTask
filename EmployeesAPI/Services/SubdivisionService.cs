@@ -30,9 +30,7 @@ namespace EmployeesAPI.Services
         ///<inheritdoc/>
         public async Task<List<SubdivisionDto>> GetAllSubdivisions()
         {
-            List<SubdivisionDto> result;
-
-            if (_cache.TryGetValue(CacheKeys.AllSubdivisions, out result))
+            if (_cache.TryGetValue(CacheKeys.AllSubdivisions, out List<SubdivisionDto> result))
             {
                 return result;
             }
@@ -41,7 +39,7 @@ namespace EmployeesAPI.Services
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                 .SetPriority(CacheItemPriority.Normal)
                 .SetSlidingExpiration(TimeSpan.FromMinutes(5));
-            result = _mapper.Map<List<SubdivisionDto>>(subdivisions).OrderBy(x => x.Title).ToList();
+            result = _mapper.Map<List<SubdivisionDto>>(subdivisions);
             _cache.Set(CacheKeys.AllSubdivisions, result, cacheEntryOptions);
 
             return result;
@@ -50,10 +48,9 @@ namespace EmployeesAPI.Services
         ///<inheritdoc/>
         public async Task<List<SubdivisionDto>> GetSubdivisions(int? parentSubdivisionId)
         {
-            List<SubdivisionDto> result;
             var chacheKey = CacheKeys.SubdivisionsByParent + parentSubdivisionId;
 
-            if (_cache.TryGetValue(chacheKey, out result))
+            if (_cache.TryGetValue(chacheKey, out List<SubdivisionDto> result))
             {
                 return result;
             }
@@ -65,28 +62,29 @@ namespace EmployeesAPI.Services
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                 .SetPriority(CacheItemPriority.High)
                 .SetSlidingExpiration(TimeSpan.FromMinutes(5));
-            result = _mapper.Map<List<SubdivisionDto>>(subdivisions).OrderBy(x => x.Title).ToList();
+            result = _mapper.Map<List<SubdivisionDto>>(subdivisions);
             _cache.Set(chacheKey, result, cacheEntryOptions);
 
             return result;
         }
 
         ///<inheritdoc/>
-        public async Task<int> EditSubdivision(EditSubdivisionDto editSubdivisionDto)
+        public async Task<ServiceResult> EditSubdivision(EditSubdivisionDto editSubdivisionDto)
         {
             var subdivision = await _context.Subdivision.FindAsync(editSubdivisionDto.Id);
 
             if (subdivision == null)
             {
-                return 1;
+                return ServiceResult.NotFound;
             }
 
             if (editSubdivisionDto.ParentId.HasValue && !(await CheckSubdivisionParentingPossibility(editSubdivisionDto.Id, (int)editSubdivisionDto.ParentId)))
             {
-                return 2;
+                return ServiceResult.DataProcessionError;
             }
 
             _cache.Remove(CacheKeys.SubdivisionsByParent + subdivision.ParentId);
+            _cache.Remove(CacheKeys.SubdivisionsAllChildren + subdivision.ParentId);
             subdivision.ParentId = editSubdivisionDto.ParentId;
             subdivision.Title = editSubdivisionDto.Title;
             subdivision.Description = editSubdivisionDto.Description;
@@ -97,22 +95,23 @@ namespace EmployeesAPI.Services
             }
             catch (DbUpdateConcurrencyException)
             {
-                return 3;
+                return ServiceResult.DataSavingError;
             }
 
             _cache.Remove(CacheKeys.AllSubdivisions);
             _cache.Remove(CacheKeys.SubdivisionsByParent + editSubdivisionDto.ParentId);
             _cache.Remove(CacheKeys.EmployeesBySubdivision + editSubdivisionDto.Id);
+            _cache.Remove(CacheKeys.SubdivisionsAllChildren + editSubdivisionDto.ParentId);
 
-            return 0;
+            return ServiceResult.Ok;
         }
 
         ///<inheritdoc/>
-        public async Task<int> AddSubdivision(AddSubdivisionDto addSubdivisionDto)
+        public async Task<ServiceResult> AddSubdivision(AddSubdivisionDto addSubdivisionDto)
         {
-            if (!addSubdivisionDto.ParentId.HasValue && await _context.Subdivision.FindAsync(addSubdivisionDto.ParentId) == null)
+            if (addSubdivisionDto.ParentId.HasValue && await _context.Subdivision.FindAsync(addSubdivisionDto.ParentId) == null)
             {
-                return 1;
+                return ServiceResult.NotFound;
             }
 
             _context.Subdivision.Add(new Subdivision()
@@ -129,23 +128,24 @@ namespace EmployeesAPI.Services
             }
             catch (DbUpdateConcurrencyException)
             {
-                return 3;
+                return ServiceResult.DataSavingError;
             }
 
             _cache.Remove(CacheKeys.AllSubdivisions);
             _cache.Remove(CacheKeys.SubdivisionsByParent + addSubdivisionDto.ParentId);
+            _cache.Remove(CacheKeys.SubdivisionsAllChildren + addSubdivisionDto.ParentId);
 
-            return 0;
+            return ServiceResult.Ok;
         }
 
         ///<inheritdoc/>
-        public async Task<int> DeleteSubdivision(int id)
+        public async Task<ServiceResult> DeleteSubdivision(int id)
         {
             var subdivision = await _context.Subdivision.FindAsync(id);
 
             if (subdivision == null)
             {
-                return 1;
+                return ServiceResult.NotFound;
             }
 
             var children = await GetAllSubdivisionChildren(id);
@@ -158,6 +158,8 @@ namespace EmployeesAPI.Services
                     _context.Subdivision.Remove(forDelete);
                     _cache.Remove(CacheKeys.SubdivisionsByParent + children[i].ParentId);
                     _cache.Remove(CacheKeys.EmployeesBySubdivision + children[i].Id);
+                    _cache.Remove(CacheKeys.SubdivisionsAllChildren + children[i].ParentId);
+                    _cache.Remove(CacheKeys.SubdivisionsAllChildren + children[i].Id);
                 }
             }
 
@@ -167,12 +169,12 @@ namespace EmployeesAPI.Services
             }
             catch (DbUpdateConcurrencyException)
             {
-                return 3;
+                return ServiceResult.DataSavingError;
             }
 
             _cache.Remove(CacheKeys.AllSubdivisions);
 
-            return 0;
+            return ServiceResult.Ok;
         }
 
         ///<inheritdoc/>
@@ -186,6 +188,13 @@ namespace EmployeesAPI.Services
         ///<inheritdoc/>
         public async Task<List<SubdivisionDto>> GetAllSubdivisionChildren(int subdivisionId)
         {
+            var cahceKey = CacheKeys.SubdivisionsAllChildren + subdivisionId;
+
+            if (_cache.TryGetValue(cahceKey, out List<SubdivisionDto> result))
+            {
+                return result;
+            }
+
             var subdivisions = new List<Subdivision>();
             subdivisions.Add(await _context.Subdivision
                 .Include(x => x.Subdivisions)
@@ -204,7 +213,10 @@ namespace EmployeesAPI.Services
                 }
             }
 
-            return _mapper.Map<List<SubdivisionDto>>(subdivisions);
+            result = _mapper.Map<List<SubdivisionDto>>(subdivisions);
+            _cache.Set(cahceKey, result);
+
+            return result;
         }
     }
 }

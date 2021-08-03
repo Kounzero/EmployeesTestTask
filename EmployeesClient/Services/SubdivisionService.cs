@@ -14,13 +14,11 @@ namespace EmployeesClient.Services
         /// <inheritdoc/>
         public async Task<HttpResponseMessage> AddSubdivision(AddSubdivisionDto addSubdivisionDto)
         {
-            var client = new HttpClient();
-
-            var response = await client.SendAsync(new HttpRequestMessage()
+            var response = await App.Client.SendAsync(new HttpRequestMessage()
             {
                 Content = new StringContent(JsonConvert.SerializeObject(addSubdivisionDto), Encoding.UTF8, "application/json"),
                 Method = HttpMethod.Post,
-                RequestUri = new Uri($"{App.AppConfig.GetCurrentConnectionString()}Subdivisions")
+                RequestUri = new Uri($"{App.AppConfig.GetConnectionString()}Subdivisions")
             });
 
             return response;
@@ -29,8 +27,7 @@ namespace EmployeesClient.Services
         /// <inheritdoc/>
         public async Task<HttpResponseMessage> DeleteSubdivision(int id)
         {
-            var client = new HttpClient();
-            var response = await client.DeleteAsync($"{App.AppConfig.GetCurrentConnectionString()}Subdivisions/{id}");
+            var response = await App.Client.DeleteAsync($"{App.AppConfig.GetConnectionString()}Subdivisions/{id}");
 
             return response;
         }
@@ -38,13 +35,11 @@ namespace EmployeesClient.Services
         /// <inheritdoc/>
         public async Task<HttpResponseMessage> EditSubdivision(EditSubdivisionDto editSubdivisionDto)
         {
-            var client = new HttpClient();
-
-            var response = await client.SendAsync(new HttpRequestMessage()
+            var response = await App.Client.SendAsync(new HttpRequestMessage()
             {
                 Content = new StringContent(JsonConvert.SerializeObject(editSubdivisionDto), Encoding.UTF8, "application/json"),
                 Method = HttpMethod.Put,
-                RequestUri = new Uri($"{App.AppConfig.GetCurrentConnectionString()}Subdivisions")
+                RequestUri = new Uri($"{App.AppConfig.GetConnectionString()}Subdivisions")
             });
 
             return response;
@@ -53,8 +48,7 @@ namespace EmployeesClient.Services
         /// <inheritdoc/>
         public async Task<List<SubdivisionDto>> GetAllSubdivisions()
         {
-            var client = new HttpClient();
-            var response = await client.GetAsync($"{App.AppConfig.GetCurrentConnectionString()}Subdivisions");
+            var response = await App.Client.GetAsync($"{App.AppConfig.GetConnectionString()}Subdivisions");
 
             if (!response.IsSuccessStatusCode)
             {
@@ -69,10 +63,9 @@ namespace EmployeesClient.Services
         /// <inheritdoc/>
         public async Task<List<SubdivisionDto>> GetSubdivisions(int? parentSubdivisionId)
         {
-            var client = new HttpClient();
-            var response = await client.GetAsync($"{App.AppConfig.GetCurrentConnectionString()}Subdivisions/GetSubdivisions{(parentSubdivisionId == null ? "" : "?parentSubdivisionId=" + parentSubdivisionId)}");
+            var parameters = parentSubdivisionId == null ? "" : "?parentSubdivisionId=" + parentSubdivisionId;
+            var response = await App.Client.GetAsync($"{App.AppConfig.GetConnectionString()}Subdivisions/GetSubdivisions{parameters}");
             var responseString = await response.Content.ReadAsStringAsync();
-
             var data = JsonConvert.DeserializeObject<List<SubdivisionDto>>(responseString);
 
             return data;
